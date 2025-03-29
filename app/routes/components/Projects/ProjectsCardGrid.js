@@ -1,5 +1,4 @@
 import React from "react";
-import { faker } from "@faker-js/faker";
 import { Link } from "react-router-dom";
 
 import {
@@ -17,41 +16,46 @@ import {
 
 import { randomArray, randomAvatar } from "./../../../utilities";
 
-const badges = [
-  <Badge pill color="success" className="mb-2" key="badge-active">
-    Active
-  </Badge>,
-  <Badge pill color="danger" className="mb-2" key="badge-suspended">
-    Suspended
-  </Badge>,
-  <Badge pill color="warning" className="mb-2" key="badge-waiting">
-    Waiting
-  </Badge>,
-  <Badge pill color="secondary" className="mb-2" key="badge-paused">
-    Paused
-  </Badge>,
-];
 
-const taskCompleted = ["15", "28", "30", "80", "57", "90"];
 
-const ProjectsCardGrid = () => (
+
+
+const ProjectsCardGrid = ({ project,index }) => {
+  const { projectName, supervisorFirstName, supervisorLastName, startDate, endDate, status } = project;
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString(); // This will display as "MM/DD/YYYY" by default
+  };
+
+  const statusBadge = {
+    Active: <Badge pill color="success">Active</Badge>,
+    Suspended: <Badge pill color="danger">Suspended</Badge>,
+    Waiting: <Badge pill color="warning">Waiting</Badge>,
+    Paused: <Badge pill color="secondary">Paused</Badge>,
+  };
+  const taskCompleted = ["15", "28", "30", "80", "57", "90"];
+
+
+  return(
   <React.Fragment>
     {/* START Card */}
     <Card>
       <CardBody>
-        {randomArray(badges)}
+        {statusBadge[status]}
         <div className="mb-2">
           <a href="#" className="mr-2">
             <i className="fa fa-fw fa-star-o"></i>
           </a>
           <Link to="/apps/tasks/grid" className="text-decoration-none">
-            {faker.company.catchPhrase()}
+             {projectName}
           </Link>
         </div>
         <div className="mb-3">
-          Last Edited by: {faker.person.firstName()} {faker.person.lastName()}{" "}
+          Supervisor: {supervisorFirstName} {supervisorLastName}
           <br />
-          {faker.date.weekday()}, 12 {faker.date.month()}, 2018
+          Start Date: {formatDate(startDate)}
+          <br />
+          End Date: {formatDate(endDate)}
         </div>
         <div className="mb-3">
           <Progress
@@ -101,6 +105,7 @@ const ProjectsCardGrid = () => (
     </Card>
     {/* END Card */}
   </React.Fragment>
-);
+ );
+};
 
 export { ProjectsCardGrid };
