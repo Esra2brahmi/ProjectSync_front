@@ -1,19 +1,35 @@
-import React from 'react';
-
-import { 
-    Pagination,
-    PaginationItem,
-    PaginationLink,
-    Card,
-    CardFooter,
-    Table
-} from './../../../components';
-
+import React, { useEffect, useState } from 'react';
+import { Pagination, PaginationItem, PaginationLink, Card, CardFooter, Table } from './../../../components';
 import { TrTableTasksList } from "./components/TrTableTasksList";
+import { useLocation } from 'react-router-dom';
 
-const TasksList = () => (
+const TasksList = () => {
+    const location = useLocation();
+    console.log("crurrent url:",location);
+    const [tasks, setTasks] = useState([]);
+    const pathSegments = location.pathname.split('/');
+    const projectId = pathSegments[pathSegments.length - 1];
+    console.log("Received projectId:", projectId);
+
+    useEffect(() => {
+        const fetchTasks = async () => {
+            if (!projectId) return;  // Prevent fetching if projectId is missing
+    
+            try {
+                const response = await fetch(`http://localhost:5197/task/byProject/${projectId}`);
+                const data = await response.json();
+                setTasks(data);
+            } catch (error) {
+                console.error("Error fetching tasks:", error);
+            }
+        };
+    
+        fetchTasks();
+    }, [projectId]); // Add projectId as a dependency
+    
+
+    return (
         <Card className="mb-3">
-            { /* START Table */}
             <div className="table-responsive-xl">
                 <Table className="mb-0" hover>
                     <thead>
@@ -22,45 +38,23 @@ const TasksList = () => (
                             <th className="align-middle bt-0">Priority</th>
                             <th className="align-middle bt-0">Title & Description</th>
                             <th className="align-middle bt-0">People</th>
-                            <th className="align-middle bt-0">Update</th>
-                            <th className="align-middle bt-0 text-right">
-                                Actions
-                            </th>
+                            <th className="align-middle bt-0">Due Date</th>
+                            <th className="align-middle bt-0 text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <TrTableTasksList />
-                        <TrTableTasksList 
-                            id="2"
-                        />
-                        <TrTableTasksList 
-                            id="3"
-                        />
-                        <TrTableTasksList 
-                            id="4"
-                        />
-                        <TrTableTasksList 
-                            id="5"
-                        />
-                        <TrTableTasksList 
-                            id="6"
-                        />
-                        <TrTableTasksList 
-                            id="7"
-                        />
-                        <TrTableTasksList 
-                            id="8"
-                        />
-                        <TrTableTasksList 
-                            id="9"
-                        />
-                        <TrTableTasksList 
-                            id="10"
-                        />
+                        {tasks.length > 0 ? (
+                            tasks.map((task, index) => (
+                                <TrTableTasksList key={index} task={task} />
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="6" className="text-center">No tasks available</td>
+                            </tr>
+                        )}
                     </tbody>
                 </Table>
             </div>
-            { /* END Table */}
             <CardFooter className="d-flex justify-content-center pb-0">
                 <Pagination aria-label="Page navigation example">
                     <PaginationItem>
@@ -69,19 +63,13 @@ const TasksList = () => (
                         </PaginationLink>
                     </PaginationItem>
                     <PaginationItem active>
-                        <PaginationLink href="#">
-                            1
-                        </PaginationLink>
+                        <PaginationLink href="#">1</PaginationLink>
                     </PaginationItem>
                     <PaginationItem>
-                        <PaginationLink href="#">
-                            2
-                        </PaginationLink>
+                        <PaginationLink href="#">2</PaginationLink>
                     </PaginationItem>
                     <PaginationItem>
-                        <PaginationLink href="#">
-                            3
-                        </PaginationLink>
+                        <PaginationLink href="#">3</PaginationLink>
                     </PaginationItem>
                     <PaginationItem>
                         <PaginationLink next href="#">
@@ -91,7 +79,9 @@ const TasksList = () => (
                 </Pagination>
             </CardFooter>
         </Card>
+    );
+};
 
-);
+
 
 export default TasksList;

@@ -1,5 +1,6 @@
 import React from "react";
 import { faker } from "@faker-js/faker";
+import { useState } from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 
@@ -43,13 +44,21 @@ const prioStatus = [
   </React.Fragment>,
 ];
 
-const TrTableTasksList = (props) => (
+const TrTableTasksList = ({ task }) => {
+  const { taskName, taskDescription, dueDate } = task;
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString();
+  };
+
+  
+  return(
   <React.Fragment>
     <tr>
       <td className="align-middle">
         <CustomInput
           type="checkbox"
-          id={`TrTableTasksList-${props.id}`}
           label=""
           inline
         />
@@ -87,19 +96,12 @@ const TrTableTasksList = (props) => (
       </td>
       <td className="align-middle">
         <div>
-          <span className="mr-2">#{faker.number.int()}</span>
           <Link to="/apps/task-details" className="text-decoration-none">
-            {faker.hacker.phrase()}
+          {taskName}{/*change this to task name from backend*/}
           </Link>
         </div>
         <p className="mb-0">
-          <span className="mr-2">{faker.lorem.sentence()}</span>
-          <Badge pill color={randomArray(badges)} className="mr-1">
-            {faker.commerce.department()}
-          </Badge>
-          <Badge pill color={randomArray(badges)} className="mr-1">
-            {faker.commerce.department()}
-          </Badge>
+          <span className="mr-2">{taskDescription}</span>{/*change this to task description from backend*/}
         </p>
       </td>
       <td className="align-middle">
@@ -121,7 +123,7 @@ const TrTableTasksList = (props) => (
           ]}
         />
       </td>
-      <td className="align-middle">16-Jul-2016</td>
+      <td className="align-middle">{formatDate(dueDate)}{/*change this to due date from backend*/}</td>
       <td className="align-middle text-right">
         <UncontrolledButtonDropdown className="align-self-center ml-auto">
           <DropdownToggle color="link" size="sm">
@@ -133,7 +135,7 @@ const TrTableTasksList = (props) => (
               <i className="fa fa-fw fa-folder-open mr-2"></i>
               View
             </DropdownItem>
-            <DropdownItem>
+            <DropdownItem >
               <i className="fa fa-fw fa-ticket mr-2"></i>
               Add Task
             </DropdownItem>
@@ -151,7 +153,8 @@ const TrTableTasksList = (props) => (
       </td>
     </tr>
   </React.Fragment>
-);
+ );
+};
 
 TrTableTasksList.propTypes = {
   id: PropTypes.node,

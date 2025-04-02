@@ -1,6 +1,7 @@
 import React from "react";
-import { Link } from "react-router-dom";
-
+import { useState } from "react";
+import { Link } from "react-router-dom"; 
+import AddTaskModal from "../Tasks/AddTaskModal"; 
 import {
   Card,
   CardBody,
@@ -21,11 +22,12 @@ import { randomArray, randomAvatar } from "./../../../utilities";
 
 
 const ProjectsCardGrid = ({ project,index }) => {
-  const { projectName, supervisorFirstName, supervisorLastName, startDate, endDate, status } = project;
+  const { id,projectName, supervisorFirstName, supervisorLastName, startDate, endDate, status } = project;
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString(); // This will display as "MM/DD/YYYY" by default
   };
+
 
   const statusBadge = {
     Active: <Badge pill color="success">Active</Badge>,
@@ -34,6 +36,12 @@ const ProjectsCardGrid = ({ project,index }) => {
     Paused: <Badge pill color="secondary">Paused</Badge>,
   };
   const taskCompleted = ["15", "28", "30", "80", "57", "90"];
+
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+
+  const toggleTaskModal = () => {
+    setIsTaskModalOpen(!isTaskModalOpen);
+  };
 
 
   return(
@@ -86,8 +94,8 @@ const ProjectsCardGrid = ({ project,index }) => {
               <i className="fa fa-fw fa-folder-open mr-2"></i>
               View
             </DropdownItem>
-            <DropdownItem>
-              <i className="fa fa-fw fa-ticket mr-2"></i>
+            <DropdownItem onClick={toggleTaskModal}>
+              <i className="fa fa-fw fa-ticket mr-2" ></i>
               Add Task
             </DropdownItem>
             <DropdownItem>
@@ -104,6 +112,7 @@ const ProjectsCardGrid = ({ project,index }) => {
       </CardFooter>
     </Card>
     {/* END Card */}
+    <AddTaskModal isOpen={isTaskModalOpen} toggle={toggleTaskModal} projectId={project.id} />
   </React.Fragment>
  );
 };

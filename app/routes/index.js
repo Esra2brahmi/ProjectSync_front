@@ -102,6 +102,8 @@ import Timeline from './Pages/Timeline';
 
 import Icons from './Icons';
 
+import TasksList from "./Apps/Tasks/TasksList";
+
 // ----------- Layout Imports ---------------
 import { DefaultNavbar } from './../layout/components/DefaultNavbar';
 import { DefaultSidebar } from './../layout/components/DefaultSidebar';
@@ -206,6 +208,7 @@ export const RoutedContent = () => {
             <Route component={ Users } path="/apps/users/:type" />
             <Route component={ UsersResults } path="/apps/users-results" />
             <Route component={ VideosResults } path="/apps/videos-results" />
+            <Route component={TasksList} path="/apps/tasks/list/:id"  />
 
             { /*    Pages Routes    */ }
             <Route component={ ComingSoon } path="/pages/coming-soon" />
@@ -218,6 +221,7 @@ export const RoutedContent = () => {
             <Route component={ Register } path="/pages/register" />
             <Route component={ Success } path="/pages/success" />
             <Route component={ Timeline } path="/pages/timeline" />
+           
 
             <Route path='/icons' exact component={Icons} />
 
