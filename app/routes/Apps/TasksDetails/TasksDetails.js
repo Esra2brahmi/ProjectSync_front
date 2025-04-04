@@ -1,4 +1,4 @@
-import React from "react";
+import React,{ useEffect, useState } from "react";
 import { faker } from "@faker-js/faker";
 
 import {
@@ -30,8 +30,60 @@ import { HeaderMain } from "../../components/HeaderMain";
 import { ProjectsSmHeader } from "../../components/Projects/ProjectsSmHeader";
 import { Attachment } from "../../components/Attachment";
 import { Comment } from "../../components/Comment";
+import { useLocation } from 'react-router-dom';
 
-const TasksDetails = () => (
+const TasksDetails = () => {
+  const location = useLocation();
+  const [task, setTask] = useState([]);
+  const [project, setProject] = useState({});
+  const pathSegments = location.pathname.split('/');
+  const id = pathSegments[pathSegments.length - 1];
+
+  useEffect(() => {
+          const fetchTask = async () => {
+              if (!id) return;  
+      
+              try {
+                  const response = await fetch(`http://localhost:5197/task/${id}`);
+                  const data = await response.json();
+                  setTask(data);
+
+                  // Fetch project details once we have projectId
+                  if (data.projectId) {
+                    fetchProject(data.projectId);
+                  }
+              } catch (error) {
+                  console.error("Error fetching task detail:", error);
+              }
+          };
+      
+          fetchTask();
+      }, [id]); 
+
+  const { taskName, taskDescription, dueDate,projectId } = task;
+
+  const fetchProject = async (projectId) => {
+    try {
+      const response = await fetch(`http://localhost:5197/project/${projectId}`);
+      const data = await response.json();
+      setProject(data);
+    } catch (error) {
+      console.error("Error fetching project detail:", error);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString();
+  };
+  
+  
+  const { projectName, supervisorFirstName,supervisorLastName, status,startDate,endDate,department } = project;
+  
+  
+  
+  
+  return (
   <React.Fragment>
     <Container>
       <HeaderMain title="Tasks Details" className="mb-5 mt-4" />
@@ -47,7 +99,7 @@ const TasksDetails = () => (
                   <td className="align-middle">Project</td>
                   <td className="text-right">
                     <a href="#" className="text-decoration-none">
-                      Analytics Redo
+                      {projectName}
                     </a>
                   </td>
                 </tr>
@@ -55,17 +107,17 @@ const TasksDetails = () => (
                   <td className="align-middle">Assigned by</td>
                   <td className="text-right">
                     <a href="#" className="text-decoration-none">
-                      {faker.person.firstName()} {faker.person.lastName()}
+                    {`${supervisorFirstName} ${supervisorLastName}`}
                     </a>
                   </td>
                 </tr>
                 <tr>
                   <td className="align-middle">Start Date</td>
-                  <td className="text-right">Thu 12 May 2016</td>
+                  <td className="text-right">{formatDate(startDate)}</td>
                 </tr>
                 <tr>
                   <td className="align-middle">End Date</td>
-                  <td className="text-right">Wed 18 May 2016</td>
+                  <td className="text-right">{formatDate(endDate)}</td>
                 </tr>
                 <tr>
                   <td className="align-middle">Priority</td>
@@ -103,16 +155,16 @@ const TasksDetails = () => (
                 </tr>
                 <tr>
                   <td className="align-middle">Progress</td>
-                  <td className="align-middle text-right">30%</td>
+                  <td className="align-middle text-right">30%</td>{/*status : doing to do done*/}
                 </tr>
                 <tr>
-                  <td className="align-middle">Task ID</td>
-                  <td className="align-middle text-right"># 6726746</td>
+                  <td className="align-middle">status</td>
+                  <td className="align-middle text-right">{status}</td>
                 </tr>
                 <tr>
-                  <td className="align-middle">Date Assigned</td>
+                  <td className="align-middle">Due Date</td>
                   <td className="align-middle text-right">
-                    Wed, 16 Dec 2015, 12:17 PM
+                      {formatDate(dueDate)}
                   </td>
                 </tr>
               </tbody>
@@ -208,26 +260,15 @@ const TasksDetails = () => (
                 <Media body>
                   <div className="mb-3">
                     <h5>
-                      <span className="mr-2">#{faker.number.int()}</span>
-                      {faker.hacker.phrase()}
+                      {taskName}
                     </h5>
                     <Badge pill color="primary" className="mr-1">
-                      {faker.commerce.department()}
-                    </Badge>
-                    <Badge pill color="secondary" className="mr-1">
-                      {faker.commerce.department()}
-                    </Badge>
-                    <Badge pill color="secondary" className="mr-1">
-                      {faker.commerce.department()}
+                      {department}
                     </Badge>
                   </div>
                 </Media>
               </Media>
-              <p className="lead">
-                Animi ea magni voluptates accusamus laboriosam. Unde repellat
-                hic id et aliquam ut qui dignissimos.
-              </p>
-              <p className="mb-4">{faker.lorem.paragraphs()}</p>
+              <p className="mb-4">{taskDescription}</p>
               {/* START Atachemnts */}
               <div className="mb-4">
                 <div className="mb-3">
@@ -297,6 +338,7 @@ const TasksDetails = () => (
       {/* END Header 1 */}
     </Container>
   </React.Fragment>
-);
+ );
+};
 
 export default TasksDetails;

@@ -48,7 +48,6 @@ const prioStatus = [
 
 const TrTableTasksList = ({ task }) => {
   const { id,taskName, taskDescription, dueDate } = task;
-
   const handleDelete = async () => {
     toast((t) => (
         <div>
@@ -143,7 +142,7 @@ const TrTableTasksList = ({ task }) => {
       </td>
       <td className="align-middle">
         <div>
-          <Link to="/apps/task-details" className="text-decoration-none">
+          <Link to={`/apps/task-details/${id}`} className="text-decoration-none">
           {taskName}{/*change this to task name from backend*/}
           </Link>
         </div>
@@ -203,11 +202,5 @@ const TrTableTasksList = ({ task }) => {
  );
 };
 
-TrTableTasksList.propTypes = {
-  id: PropTypes.node,
-};
-TrTableTasksList.defaultProps = {
-  id: "1",
-};
 
 export { TrTableTasksList };

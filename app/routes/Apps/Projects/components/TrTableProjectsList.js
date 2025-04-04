@@ -7,6 +7,7 @@ import { useState } from "react";
 import { randomArray, randomAvatar } from "./../../../../utilities";
 import axios from "axios";
 import toast from 'react-hot-toast';
+import UpdateProjectModal from "../../../components/Projects/UpdateProjectModal";
 
 import {
   Badge,
@@ -19,9 +20,21 @@ import {
 } from "./../../../../components";
 const badges = ["secondary"];
 /*eslint-disable */
-const TrTableProjectsList = ({ project,index }) => {
-  const { id,projectName, supervisorFirstName, supervisorLastName, startDate, endDate, status,department } = project;
+const TrTableProjectsList = ({ project, index, refreshProjects }) => {
+  const { id,projectName, supervisorFirstName, supervisorLastName, startDate, endDate, status,department,level } = project;
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
   
+
+  const toggleUpdateModal = () => setIsUpdateModalOpen(!isUpdateModalOpen);
+  const handleOpenUpdateModal = () => {
+    setSelectedProject(project);
+    setTimeout(toggleUpdateModal, 0); 
+  };
+
+  const handleProjectUpdated = () => {
+    refreshProjects(); // coming from props
+  }; 
   const handleDelete = async () => {
     toast((t) => (
         <div>
@@ -33,6 +46,7 @@ const TrTableProjectsList = ({ project,index }) => {
                         try {
                             await axios.delete(`http://localhost:5197/project/${id}`);
                             toast.success("Project deleted successfully!");
+                            refreshProjects();
                         } catch (error) {
                             console.error("Error deleting project:", error);
                             toast.error("Failed to delete project.");
@@ -129,7 +143,7 @@ const TrTableProjectsList = ({ project,index }) => {
               </div>
           </td>
           <td className="align-middle">
-              <Avatar.Image size="md" src={randomAvatar()} />
+          {level || "PFA1"}
           </td>
           <td className="align-middle text-right">
               <UncontrolledButtonDropdown>
@@ -138,11 +152,11 @@ const TrTableProjectsList = ({ project,index }) => {
                       <i className="fa fa-angle-down ml-2" />
                   </DropdownToggle>
                   <DropdownMenu right>
-                      <DropdownItem>
-                          <i className="fa fa-fw fa-folder-open mr-2"></i> View
+                      <DropdownItem onClick={handleOpenUpdateModal}>
+                          <i className="fa fa-fw fa-edit mr-2"></i> Update
                       </DropdownItem>
                       <DropdownItem onClick={toggleTaskModal}>
-                          <i className="fa fa-fw fa-ticket mr-2"></i> Add Task
+                          <i className="fa fa-fw fa-plus mr-2"></i> Add Task
                       </DropdownItem>
                       <DropdownItem>
                           <i className="fa fa-fw fa-paperclip mr-2"></i> Add Files
@@ -155,6 +169,7 @@ const TrTableProjectsList = ({ project,index }) => {
               </UncontrolledButtonDropdown>
           </td>
           <AddTaskModal isOpen={isTaskModalOpen} toggle={toggleTaskModal} projectId={project.id} />
+          <UpdateProjectModal isOpen={isUpdateModalOpen} toggle={toggleUpdateModal} project={selectedProject} onProjectUpdated={handleProjectUpdated}/>
       </tr>
       
   );

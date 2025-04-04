@@ -2,14 +2,15 @@ import React, { useState } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Form, FormGroup, Label, Input } from 'reactstrap';
 import toast from 'react-hot-toast';
 
-const AddProjectModal = ({ isOpen, toggle }) => {
+const AddProjectModal = ({ isOpen, toggle, onProjectAdded }) => {
     const [projectName, setProjectName] = useState('');
     const [supervisorFirstName, setSupervisorFirstName] = useState('');
     const [supervisorLastName, setSupervisorLastName] = useState('');
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [status, setStatus] = useState('Active');
-    const [department, setDepartment] = useState('Mechanical Engineering'); // Default department
+    const [department, setDepartment] = useState('Mechanical Engineering'); 
+    const [level, setLevel] = useState('PFA1');
 
     const handleSubmit = async () => {
         const newProject = {
@@ -19,7 +20,8 @@ const AddProjectModal = ({ isOpen, toggle }) => {
             startDate,
             endDate,
             status,
-            department, // Include the selected department
+            department,
+            level,
         };
 
         try {
@@ -31,6 +33,7 @@ const AddProjectModal = ({ isOpen, toggle }) => {
 
             if (response.ok) {
                 toast.success('Project added successfully!');
+                onProjectAdded();
             } else {
                 toast.error('Failed to add project. Please try again.');
             }
@@ -46,8 +49,9 @@ const AddProjectModal = ({ isOpen, toggle }) => {
         setStartDate('');
         setEndDate('');
         setStatus('Active');
-        setDepartment('Mechanical Engineering'); // Reset department to default
-        toggle(); // Close modal
+        setDepartment('Mechanical Engineering'); 
+        setLevel('PFA1');
+        toggle(); 
     };
 
     return (
@@ -104,6 +108,19 @@ const AddProjectModal = ({ isOpen, toggle }) => {
                             <option value="Industrial Engineering">Industrial Engineering</option>
                             <option value="Civil Engineering">Civil Engineering</option>
                             <option value="Applied Mathematics Engineering">Applied Mathematics and Modeling</option>
+                        </Input>
+                    </FormGroup>
+                    <FormGroup>
+                        <Label for="level">Level</Label>
+                        <Input
+                            type="select"
+                            id="level"
+                            value={level}
+                            onChange={(e) => setLevel(e.target.value)}
+                        >
+                            <option value="PFA1">PFA1</option>
+                            <option value="PFA2">PFA2</option>
+                            <option value="PFE">PFE</option>
                         </Input>
                     </FormGroup>
                 </Form>
