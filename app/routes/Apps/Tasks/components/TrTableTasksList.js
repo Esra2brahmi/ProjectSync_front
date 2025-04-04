@@ -3,6 +3,8 @@ import { faker } from "@faker-js/faker";
 import { useState } from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 import {
   Badge,
@@ -45,7 +47,52 @@ const prioStatus = [
 ];
 
 const TrTableTasksList = ({ task }) => {
-  const { taskName, taskDescription, dueDate } = task;
+  const { id,taskName, taskDescription, dueDate } = task;
+
+  const handleDelete = async () => {
+    toast((t) => (
+        <div>
+            <p>Are you sure you want to delete this task?</p>
+            <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+                <button
+                    onClick={async () => {
+                        toast.dismiss(t.id); // Close the toast
+                        try {
+                            await axios.delete(`http://localhost:5197/task/${id}`);
+                            toast.success("Task deleted successfully!");
+                        } catch (error) {
+                            console.error("Error deleting Task:", error);
+                            toast.error("Failed to delete Task.");
+                        }
+                    }}
+                    style={{
+                        background: "red",
+                        color: "white",
+                        border: "none",
+                        padding: "5px 10px",
+                        cursor: "pointer",
+                        borderRadius: "5px",
+                    }}
+                >
+                    Yes
+                </button>
+                <button
+                    onClick={() => toast.dismiss(t.id)}
+                    style={{
+                        background: "gray",
+                        color: "white",
+                        border: "none",
+                        padding: "5px 10px",
+                        cursor: "pointer",
+                        borderRadius: "5px",
+                    }}
+                >
+                    No
+                </button>
+            </div>
+        </div>
+    ), { duration: Infinity });
+  };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -144,7 +191,7 @@ const TrTableTasksList = ({ task }) => {
               Add Files
             </DropdownItem>
             <DropdownItem divider />
-            <DropdownItem>
+            <DropdownItem onClick={handleDelete}>
               <i className="fa fa-fw fa-trash mr-2"></i>
               Delete
             </DropdownItem>

@@ -16,13 +16,13 @@ import {
 } from "./../../../components";
 
 import { randomArray, randomAvatar } from "./../../../utilities";
-
+const badges = ["secondary"];
 
 
 
 
 const ProjectsCardGrid = ({ project,index }) => {
-  const { id,projectName, supervisorFirstName, supervisorLastName, startDate, endDate, status } = project;
+  const { id,projectName, supervisorFirstName, supervisorLastName, startDate, endDate, status,department } = project;
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString(); // This will display as "MM/DD/YYYY" by default
@@ -54,7 +54,7 @@ const ProjectsCardGrid = ({ project,index }) => {
           <a href="#" className="mr-2">
             <i className="fa fa-fw fa-star-o"></i>
           </a>
-          <Link to="/apps/tasks/grid" className="text-decoration-none">
+          <Link to={`/apps/tasks/grid/${id}`} className="text-decoration-none">
              {projectName}
           </Link>
         </div>
@@ -83,7 +83,12 @@ const ProjectsCardGrid = ({ project,index }) => {
         </div>
       </CardBody>
       <CardFooter className="d-flex">
-        <span className="align-self-center">20 Sep, Fri, 2018</span>
+        <p className="mb-0">
+                <Badge pill color={randomArray(badges)} className="mr-1">
+                    {department}
+                    {/*idk how to change this but im thinking about bagdes like genie info/indus/meca.. and get them from backend*/}
+                </Badge>
+        </p>
         <UncontrolledButtonDropdown className="align-self-center ml-auto">
           <DropdownToggle color="link" size="sm" className="pr-0">
             <i className="fa fa-gear" />

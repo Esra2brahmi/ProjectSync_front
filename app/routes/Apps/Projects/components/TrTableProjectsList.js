@@ -5,6 +5,8 @@ import { Link } from "react-router-dom";
 import AddTaskModal from "../../../components/Tasks/AddTaskModal";
 import { useState } from "react";
 import { randomArray, randomAvatar } from "./../../../../utilities";
+import axios from "axios";
+import toast from 'react-hot-toast';
 
 import {
   Badge,
@@ -18,13 +20,56 @@ import {
 const badges = ["secondary"];
 /*eslint-disable */
 const TrTableProjectsList = ({ project,index }) => {
-  const { id,projectName, supervisorFirstName, supervisorLastName, startDate, endDate, status } = project;
+  const { id,projectName, supervisorFirstName, supervisorLastName, startDate, endDate, status,department } = project;
   
-  
+  const handleDelete = async () => {
+    toast((t) => (
+        <div>
+            <p>Are you sure you want to delete this project?</p>
+            <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+                <button
+                    onClick={async () => {
+                        toast.dismiss(t.id); 
+                        try {
+                            await axios.delete(`http://localhost:5197/project/${id}`);
+                            toast.success("Project deleted successfully!");
+                        } catch (error) {
+                            console.error("Error deleting project:", error);
+                            toast.error("Failed to delete project.");
+                        }
+                    }}
+                    style={{
+                        background: "red",
+                        color: "white",
+                        border: "none",
+                        padding: "5px 10px",
+                        cursor: "pointer",
+                        borderRadius: "5px",
+                    }}
+                >
+                    Yes
+                </button>
+                <button
+                    onClick={() => toast.dismiss(t.id)}
+                    style={{
+                        background: "gray",
+                        color: "white",
+                        border: "none",
+                        padding: "5px 10px",
+                        cursor: "pointer",
+                        borderRadius: "5px",
+                    }}
+                >
+                    No
+                </button>
+            </div>
+        </div>
+    ), { duration: Infinity });
+  };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString(); // This will display as "MM/DD/YYYY" by default
+    return date.toLocaleDateString(); 
   };
   const statusBadge = {
       Active: <Badge pill color="success">Active</Badge>,
@@ -66,7 +111,7 @@ const TrTableProjectsList = ({ project,index }) => {
               </span>
               <p className="mb-0">
                 <Badge pill color={randomArray(badges)} className="mr-1">
-                    {faker.commerce.department()}
+                    {department}
                     {/*idk how to change this but im thinking about bagdes like genie info/indus/meca.. and get them from backend*/}
                 </Badge>
               </p>
@@ -103,7 +148,7 @@ const TrTableProjectsList = ({ project,index }) => {
                           <i className="fa fa-fw fa-paperclip mr-2"></i> Add Files
                       </DropdownItem>
                       <DropdownItem divider />
-                      <DropdownItem>
+                      <DropdownItem onClick={handleDelete}>
                           <i className="fa fa-fw fa-trash mr-2"></i> Delete
                       </DropdownItem>
                   </DropdownMenu>

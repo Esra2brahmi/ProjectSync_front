@@ -1,6 +1,4 @@
 import React from "react";
-import { faker } from "@faker-js/faker";
-import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 
 import {
@@ -47,7 +45,15 @@ const prioStatus = [
   </React.Fragment>,
 ];
 
-const TasksCardGrid = (props) => (
+const TasksCardGrid = ({ task }) =>{
+  const { taskName, taskDescription, dueDate } = task;
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString();
+  };
+  
+  return  (
   <React.Fragment>
     {/* START Card */}
     <Card>
@@ -82,29 +88,13 @@ const TasksCardGrid = (props) => (
           </DropdownMenu>
         </UncontrolledButtonDropdown>
         <Media className="mb-2">
-          <Media left middle className="mr-2">
-            <CustomInput
-              type="checkbox"
-              id={`TasksCardGrid-${props.id}`}
-              label=""
-            />
-          </Media>
           <Media body>
-            <span className="mr-2">#{faker.number.int()}</span>
             <Link to="/apps/task-details" className="text-decoration-none">
-              {faker.hacker.phrase()}
+               {taskName}
             </Link>
           </Media>
         </Media>
-        <p className="mb-2">{faker.lorem.sentence()}</p>
-        <div className="mb-3">
-          <Badge pill color={randomArray(badgesColors)} className="mr-1">
-            {faker.commerce.department()}
-          </Badge>
-          <Badge pill color={randomArray(badgesColors)} className="mr-1">
-            {faker.commerce.department()}
-          </Badge>
-        </div>
+        <p className="mb-2">{taskDescription}</p>
         <div>
           <Avatar.Image
             size="md"
@@ -160,7 +150,7 @@ const TasksCardGrid = (props) => (
         </div>
       </CardBody>
       <CardFooter className="d-flex">
-        <span className="align-self-center">20 Sep, Fri, 2018</span>
+        <span className="align-self-center">{formatDate(dueDate)}</span>
         <UncontrolledButtonDropdown className="align-self-center ml-auto">
           <DropdownToggle color="link" size="sm" className="pr-0">
             <i className="fa fa-gear" />
@@ -192,11 +182,7 @@ const TasksCardGrid = (props) => (
   </React.Fragment>
 );
 
-TasksCardGrid.propTypes = {
-  id: PropTypes.node,
 };
-TasksCardGrid.defaultProps = {
-  id: "1",
-};
+
 
 export { TasksCardGrid };

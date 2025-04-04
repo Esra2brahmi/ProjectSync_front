@@ -125,7 +125,7 @@ const TrTableUsersList = (props) => {
           </Media>
         </td>
         <td className="align-middle">{faker.internet.email()}</td>
-        <td className="align-middle">{faker.phone.phoneNumberFormat()}</td>
+        <td className="align-middle">{faker.phone.number()}</td>
         <td className="align-middle text-right">
           <UncontrolledButtonDropdown>
             <DropdownToggle color="link" className="pr-0">

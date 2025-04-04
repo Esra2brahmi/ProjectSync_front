@@ -5,11 +5,9 @@ import { useLocation } from 'react-router-dom';
 
 const TasksList = () => {
     const location = useLocation();
-    console.log("crurrent url:",location);
     const [tasks, setTasks] = useState([]);
     const pathSegments = location.pathname.split('/');
     const projectId = pathSegments[pathSegments.length - 1];
-    console.log("Received projectId:", projectId);
 
     useEffect(() => {
         const fetchTasks = async () => {
