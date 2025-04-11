@@ -10,7 +10,7 @@ const TasksGrid = () => {
     const pathSegments = location.pathname.split('/');
     const projectId = pathSegments[pathSegments.length - 1];
 
-    useEffect(() => {
+    
             const fetchTasks = async () => {
                 if (!projectId) return;  // Prevent fetching if projectId is missing
         
@@ -22,7 +22,7 @@ const TasksGrid = () => {
                     console.error("Error fetching tasks:", error);
                 }
             };
-        
+        useEffect(() => {
             fetchTasks();
         }, [projectId]); 
     
@@ -31,7 +31,7 @@ const TasksGrid = () => {
         <CardColumns>
             {tasks.length > 0 ? (
                         tasks.map((task) => (
-                            <TasksCardGrid task={task} />
+                            <TasksCardGrid task={task} refreshTasks={fetchTasks}  />
                         ))
                     ) : (
                         <p className="text-center">No tasks available</p>

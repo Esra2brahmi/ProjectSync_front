@@ -1,6 +1,6 @@
-import React,{ useEffect, useState } from "react";
+import React,{ useEffect, useState,useCallback } from "react";
 import { faker } from "@faker-js/faker";
-
+import TaskAttachments from "./TaskAttachments";
 import {
   Container,
   Row,
@@ -34,10 +34,31 @@ import { useLocation } from 'react-router-dom';
 
 const TasksDetails = () => {
   const location = useLocation();
-  const [task, setTask] = useState([]);
+  const [task, setTask] = useState({ 
+    attachments: [],
+    taskName: '',
+    taskDescription: '',
+    dueDate: '',
+    projectId: null
+  });
   const [project, setProject] = useState({});
   const pathSegments = location.pathname.split('/');
   const id = pathSegments[pathSegments.length - 1];
+
+  // Memoize the callback to prevent unnecessary re-renders
+  const handleAttachmentsUpdate = useCallback((updatedAttachments) => {
+    console.log('Updating attachments with:', updatedAttachments);
+    setTask(prev => {
+    // Ensure we're getting a proper array
+    const newAttachments = Array.isArray(updatedAttachments) ? updatedAttachments : [];
+    
+    // Deep comparison
+    if (JSON.stringify(prev.attachments) === JSON.stringify(newAttachments)) {
+      return prev;
+    }
+      return { ...prev, attachments: newAttachments  };
+    });
+  }, []);
 
   useEffect(() => {
           const fetchTask = async () => {
@@ -46,7 +67,12 @@ const TasksDetails = () => {
               try {
                   const response = await fetch(`http://localhost:5197/task/${id}`);
                   const data = await response.json();
-                  setTask(data);
+                  setTask(prev => ({
+                  ...prev,
+                  ...data,
+                  // Ensure attachments are always an array
+                  attachments: Array.isArray(data.attachments) ? data.attachments : prev.attachments
+                }));
 
                   // Fetch project details once we have projectId
                   if (data.projectId) {
@@ -80,10 +106,7 @@ const TasksDetails = () => {
   
   const { projectName, supervisorFirstName,supervisorLastName, status,startDate,endDate,department } = project;
   
-  
-  
-  
-  return (
+   return (
   <React.Fragment>
     <Container>
       <HeaderMain title="Tasks Details" className="mb-5 mt-4" />
@@ -270,41 +293,11 @@ const TasksDetails = () => {
               </Media>
               <p className="mb-4">{taskDescription}</p>
               {/* START Atachemnts */}
-              <div className="mb-4">
-                <div className="mb-3">
-                  <span className="small mr-3">Attachments</span>
-                  <Badge pill color="secondary">
-                    3
-                  </Badge>
-                </div>
-                <div className="mb-3">
-                  <Attachment
-                    icon="file-word-o"
-                    iconClassName="text-white"
-                    BgIconClassName="text-primary"
-                  />
-                </div>
-                <div className="mb-3">
-                  <Attachment
-                    icon="file-excel-o"
-                    iconClassName="text-white"
-                    BgIconClassName="text-success"
-                  />
-                </div>
-                <div className="mb-3">
-                  <Attachment
-                    icon="file-powerpoint-o"
-                    iconClassName="text-white"
-                    BgIconClassName="text-warning"
-                  />
-                </div>
-                <div className="mb-5">
-                  <a href="#">
-                    <i className="fa fa-plus mr-2"></i>
-                    Add More Files to this Task
-                  </a>
-                </div>
-              </div>
+              <TaskAttachments 
+                  taskId={id}
+                  attachments={task.attachments || []}
+                  onAttachmentsUpdate={handleAttachmentsUpdate}
+                />
               {/* END Atachemnts */}
               <div className="mb-3">
                 <span className="small mr-3">Comments</span>
@@ -340,5 +333,8 @@ const TasksDetails = () => {
   </React.Fragment>
  );
 };
+
+
+
 
 export default TasksDetails;

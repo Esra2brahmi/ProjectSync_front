@@ -1,13 +1,11 @@
 import React from "react";
-import { faker } from "@faker-js/faker";
-import { useState } from "react";
-import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { useState } from "react";
 import toast from "react-hot-toast";
+import UpdateTaskModal from "../../../components/Tasks/UpdateTaskModal";
 
 import {
-  Badge,
   Avatar,
   CustomInput,
   UncontrolledButtonDropdown,
@@ -46,8 +44,22 @@ const prioStatus = [
   </React.Fragment>,
 ];
 
-const TrTableTasksList = ({ task }) => {
+const TrTableTasksList = ({ task,refreshTasks }) => {
   const { id,taskName, taskDescription, dueDate } = task;
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
+
+  const toggleUpdateModal = () => setIsUpdateModalOpen(!isUpdateModalOpen);
+
+  const handleOpenUpdateModal = () => {
+    setSelectedTask(task);
+    setTimeout(toggleUpdateModal, 0);
+  };
+
+   const handleTaskUpdated = () => {
+    refreshTasks(); 
+  };
+
   const handleDelete = async () => {
     toast((t) => (
         <div>
@@ -143,11 +155,11 @@ const TrTableTasksList = ({ task }) => {
       <td className="align-middle">
         <div>
           <Link to={`/apps/task-details/${id}`} className="text-decoration-none">
-          {taskName}{/*change this to task name from backend*/}
+          {taskName}
           </Link>
         </div>
         <p className="mb-0">
-          <span className="mr-2">{taskDescription}</span>{/*change this to task description from backend*/}
+          <span className="mr-2">{taskDescription}</span>
         </p>
       </td>
       <td className="align-middle">
@@ -169,7 +181,7 @@ const TrTableTasksList = ({ task }) => {
           ]}
         />
       </td>
-      <td className="align-middle">{formatDate(dueDate)}{/*change this to due date from backend*/}</td>
+      <td className="align-middle">{formatDate(dueDate)}</td>
       <td className="align-middle text-right">
         <UncontrolledButtonDropdown className="align-self-center ml-auto">
           <DropdownToggle color="link" size="sm">
@@ -177,12 +189,12 @@ const TrTableTasksList = ({ task }) => {
             <i className="fa fa-angle-down ml-2" />
           </DropdownToggle>
           <DropdownMenu right>
-            <DropdownItem>
-              <i className="fa fa-fw fa-folder-open mr-2"></i>
-              View
+            <DropdownItem onClick={handleOpenUpdateModal}>
+              <i className="fa fa-fw fa-edit mr-2"></i>
+              Update
             </DropdownItem>
             <DropdownItem >
-              <i className="fa fa-fw fa-ticket mr-2"></i>
+              <i className="fa fa-fw fa-plus mr-2"></i>
               Add Task
             </DropdownItem>
             <DropdownItem>
@@ -197,7 +209,17 @@ const TrTableTasksList = ({ task }) => {
           </DropdownMenu>
         </UncontrolledButtonDropdown>
       </td>
+
     </tr>
+    {selectedTask && (
+        <UpdateTaskModal 
+          isOpen={isUpdateModalOpen} 
+          toggle={toggleUpdateModal} 
+          task={selectedTask} 
+          refreshTasks={refreshTasks} 
+          onTaskUpdated={handleTaskUpdated}
+        />
+      )}
   </React.Fragment>
  );
 };

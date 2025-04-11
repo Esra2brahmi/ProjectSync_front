@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Pagination, PaginationItem, PaginationLink, Card, CardFooter, Table } from './../../../components';
 import { TrTableProjectsList } from "./components/TrTableProjectsList";
-import { ProjectsSmHeader } from './../../components/Projects/ProjectsSmHeader';
+
 
 const ProjectsList = () => {
     const [projects, setProjects] = useState([]);

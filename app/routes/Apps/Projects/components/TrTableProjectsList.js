@@ -1,10 +1,9 @@
 import React from "react";
 import _ from "lodash";
-import { faker } from "@faker-js/faker";
 import { Link } from "react-router-dom";
 import AddTaskModal from "../../../components/Tasks/AddTaskModal";
 import { useState } from "react";
-import { randomArray, randomAvatar } from "./../../../../utilities";
+import { randomArray} from "./../../../../utilities";
 import axios from "axios";
 import toast from 'react-hot-toast';
 import UpdateProjectModal from "../../../components/Projects/UpdateProjectModal";
@@ -12,7 +11,6 @@ import UpdateProjectModal from "../../../components/Projects/UpdateProjectModal"
 import {
   Badge,
   Progress,
-  Avatar,
   UncontrolledButtonDropdown,
   DropdownToggle,
   DropdownMenu,
@@ -27,14 +25,16 @@ const TrTableProjectsList = ({ project, index, refreshProjects }) => {
   
 
   const toggleUpdateModal = () => setIsUpdateModalOpen(!isUpdateModalOpen);
+
   const handleOpenUpdateModal = () => {
     setSelectedProject(project);
     setTimeout(toggleUpdateModal, 0); 
   };
 
   const handleProjectUpdated = () => {
-    refreshProjects(); // coming from props
+    refreshProjects(); 
   }; 
+  
   const handleDelete = async () => {
     toast((t) => (
         <div>
@@ -126,7 +126,6 @@ const TrTableProjectsList = ({ project, index, refreshProjects }) => {
               <p className="mb-0">
                 <Badge pill color={randomArray(badges)} className="mr-1">
                     {department}
-                    {/*idk how to change this but im thinking about bagdes like genie info/indus/meca.. and get them from backend*/}
                 </Badge>
               </p>
           </td>

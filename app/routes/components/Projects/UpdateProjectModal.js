@@ -36,6 +36,7 @@ const UpdateProjectModal = ({ isOpen, toggle, project, onProjectUpdated }) => {
   
 
   const handleChange = (e) => {
+    e.persist();
     setFormData(prev => ({ ...prev, [e.target.id]: e.target.value }));
   };
 

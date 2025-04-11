@@ -1,6 +1,6 @@
-import React from "react";
+import React,{ useState } from "react";
 import { Link } from "react-router-dom";
-
+import UpdateTaskModal from "./UpdateTaskModal";
 import {
   Card,
   CardBody,
@@ -45,12 +45,25 @@ const prioStatus = [
   </React.Fragment>,
 ];
 
-const TasksCardGrid = ({ task }) =>{
-  const { taskName, taskDescription, dueDate } = task;
+const TasksCardGrid = ({ task,refreshTasks }) =>{
+  const { id,taskName, taskDescription, dueDate } = task;
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString();
+  };
+
+  const toggleUpdateModal = () => setIsUpdateModalOpen(!isUpdateModalOpen);
+
+  const handleOpenUpdateModal = () => {
+    setSelectedTask(task);
+    setTimeout(toggleUpdateModal, 0);
+  };
+
+   const handleTaskUpdated = () => {
+    refreshTasks(); 
   };
   
   return  (
@@ -89,7 +102,7 @@ const TasksCardGrid = ({ task }) =>{
         </UncontrolledButtonDropdown>
         <Media className="mb-2">
           <Media body>
-            <Link to="/apps/task-details" className="text-decoration-none">
+            <Link to={`/apps/task-details/${id}`} className="text-decoration-none">
                {taskName}
             </Link>
           </Media>
@@ -157,12 +170,12 @@ const TasksCardGrid = ({ task }) =>{
             <i className="fa fa-angle-down ml-2" />
           </DropdownToggle>
           <DropdownMenu right>
-            <DropdownItem>
-              <i className="fa fa-fw fa-folder-open mr-2"></i>
-              View
+            <DropdownItem onClick={handleOpenUpdateModal}>
+              <i className="fa fa-fw fa-edit mr-2"></i>
+              Update Task
             </DropdownItem>
             <DropdownItem>
-              <i className="fa fa-fw fa-ticket mr-2"></i>
+              <i className="fa fa-fw fa-plus mr-2"></i>
               Add Task
             </DropdownItem>
             <DropdownItem>
@@ -178,6 +191,13 @@ const TasksCardGrid = ({ task }) =>{
         </UncontrolledButtonDropdown>
       </CardFooter>
     </Card>
+    <UpdateTaskModal 
+          isOpen={isUpdateModalOpen} 
+          toggle={toggleUpdateModal} 
+          task={selectedTask} 
+          refreshTasks={refreshTasks} 
+          onTaskUpdated={handleTaskUpdated}
+        />
     {/* END Card */}
   </React.Fragment>
 );

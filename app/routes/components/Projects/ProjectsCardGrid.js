@@ -15,18 +15,33 @@ import {
   DropdownItem,
 } from "./../../../components";
 
+import UpdateProjectModal from "../Projects/UpdateProjectModal";
+
 import { randomArray, randomAvatar } from "./../../../utilities";
 const badges = ["secondary"];
 
 
 
 
-const ProjectsCardGrid = ({ project,index }) => {
+const ProjectsCardGrid = ({ project,index, refreshProjects }) => {
   const { id,projectName, supervisorFirstName, supervisorLastName, startDate, endDate, status,department } = project;
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString(); // This will display as "MM/DD/YYYY" by default
   };
+
+  const toggleUpdateModal = () => setIsUpdateModalOpen(!isUpdateModalOpen);
+
+  const handleOpenUpdateModal = () => {
+    setSelectedProject(project);
+    setTimeout(toggleUpdateModal, 0); 
+  };
+
+  const handleProjectUpdated = () => {
+    refreshProjects(); 
+  }; 
 
 
   const statusBadge = {
@@ -95,9 +110,9 @@ const ProjectsCardGrid = ({ project,index }) => {
             <i className="fa fa-angle-down ml-2" />
           </DropdownToggle>
           <DropdownMenu right>
-            <DropdownItem>
-              <i className="fa fa-fw fa-folder-open mr-2"></i>
-              View
+            <DropdownItem onClick={handleOpenUpdateModal}>
+              <i className="fa fa-fw fa-edit mr-2"></i>
+              Update 
             </DropdownItem>
             <DropdownItem onClick={toggleTaskModal}>
               <i className="fa fa-fw fa-ticket mr-2" ></i>
@@ -118,6 +133,8 @@ const ProjectsCardGrid = ({ project,index }) => {
     </Card>
     {/* END Card */}
     <AddTaskModal isOpen={isTaskModalOpen} toggle={toggleTaskModal} projectId={project.id} />
+    <UpdateProjectModal isOpen={isUpdateModalOpen} toggle={toggleUpdateModal} project={selectedProject} onProjectUpdated={handleProjectUpdated}/>
+
   </React.Fragment>
  );
 };
