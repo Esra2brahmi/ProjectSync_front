@@ -10,7 +10,7 @@ import { HeaderMain } from "../../components/HeaderMain";
 import UsersList from './UsersList';
 import UsersGrid from './UsersGrid';
 import { UsersLeftNav } from "../../components/Users/UsersLeftNav";
-import { ProjectsSmHeader } from "../../components/Projects/ProjectsSmHeader";
+import { UserSmHeader } from "../../components/Users/UserSmHeader";
 
 const Users = (props) => (
     <React.Fragment>
@@ -24,7 +24,7 @@ const Users = (props) => (
                     <UsersLeftNav />
                 </Col>
                 <Col lg={ 9 }>
-                    <ProjectsSmHeader 
+                <UserSmHeader 
                         subTitle={props.match.params.type === "list"?"Users List":"Users Grid"}
                         linkList="/apps/users/list"
                         linkGrid="/apps/users/grid"

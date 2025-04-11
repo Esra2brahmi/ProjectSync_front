@@ -1,7 +1,4 @@
-import React from "react";
-import { faker } from "@faker-js/faker";
-import PropTypes from "prop-types";
-
+import React,{ useState } from "react";
 import {
   Media,
   Avatar,
@@ -12,10 +9,14 @@ import {
   DropdownMenu,
   DropdownItem,
 } from "./../../../../components";
+import EditUserModal from "./EditUserModal"; 
+import {  randomAvatar } from "./../../../../utilities";
 
-import { randomArray, randomAvatar } from "./../../../../utilities";
-
-const TrTableUsersList = (props) => {
+const TrTableUsersList = ({ user,index, onDeleteUser,updateUser }) => {
+  const { id,userFirstName, userLastName, department, email, classe, projectType,supervisorFullName } = user;
+  const [isSelected, setIsSelected] = useState(false);
+  const [isModalOpen, setModalOpen] = useState(false);
+ const toggleModal = () => setModalOpen(!isModalOpen);
   const avatar = [
     [
       <AvatarAddOn.Icon
@@ -83,15 +84,64 @@ const TrTableUsersList = (props) => {
       />,
     ],
   ];
+  const handleCheckboxChange = () => {setIsSelected(!isSelected);};
+  //method for editing the user
+  const handleEdit=async(updatedUser)=>{
+    if(isSelected){
+      try{
+        const response=await fetch(`http://localhost:5197/user/${id}`,{
+          method:"PUT",
+          headers: {
+            "Content-Type": "application/json",//Indique au serveur que tu envoies du JSON
+          },
+          body:JSON.stringify(updatedUser)//convertit l'objet updatedUser en JSON
+        });
+        if (response.ok) {
+          console.log("User edited successfully");
+          updateUser(updatedUser);
+          setIsSelected(false)
+        } else {
+          console.error("Error editing user", response);
+         
+        }
+      } catch (error) {
+        console.error("Error editing user:", error);
+      }
+    }
+  };
+  //method for deleting user
+  const handleDelete = async () => {
+    if (isSelected) {
+      try {
+        const response = await fetch(`http://localhost:5197/user/${id}`, {
+          method: "DELETE",  // Utilisation de la méthode DELETE pour supprimer
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+          if (response.ok) {
+          onDeleteUser(id); 
+        } else {
+          console.error("Error deleting user", response);
+         
+        }
+      } catch (error) {
+        console.error("Error deleting user:", error);
+      }
+    }
+  };
+  
   return (
     <React.Fragment>
       <tr>
         <td className="align-middle">
           <CustomInput
             type="checkbox"
-            id={`TrTableUsersList-${props.id}`}
+            id={`TrTableUsersList-${id}`}
             label=""
             inline
+            checked={isSelected}
+            onChange={handleCheckboxChange}
           />
         </td>
         <td className="align-middle">
@@ -106,26 +156,18 @@ const TrTableUsersList = (props) => {
                 size="md"
                 src={randomAvatar()}
                 className="align-self-center"
-                addOns={[
-                  <AvatarAddOn.Icon
-                    className="fa fa-circle"
-                    color="white"
-                    key="avatar-icon-white-bg"
-                  />,
-                  ...randomArray(avatar),
-                ]}
               />
             </Media>
             <Media body>
               <a className="mt-0 d-flex text-decoration-none" href="#">
-                {faker.person.firstName()} {faker.person.lastName()}
+                {userFirstName} {userLastName}
               </a>
-              <span>{faker.person.jobTitle()}</span>
+              <span>{classe}</span>
             </Media>
           </Media>
         </td>
-        <td className="align-middle">{faker.internet.email()}</td>
-        <td className="align-middle">{faker.phone.phoneNumberFormat()}</td>
+        <td className="align-middle">{email}</td>
+        <td className="align-middle">{department}</td>
         <td className="align-middle text-right">
           <UncontrolledButtonDropdown>
             <DropdownToggle color="link" className="pr-0">
@@ -149,12 +191,12 @@ const TrTableUsersList = (props) => {
                 <i className="fa fa-fw fa-user mr-2"></i>
                 Profile
               </DropdownItem>
-              <DropdownItem>
+              <DropdownItem onClick={toggleModal}>
                 <i className="fa fa-fw fa-pencil mr-2"></i>
                 Edit
               </DropdownItem>
               <DropdownItem divider />
-              <DropdownItem>
+              <DropdownItem onClick={handleDelete}>
                 <i className="fa fa-fw fa-trash mr-2"></i>
                 Delete
               </DropdownItem>
@@ -162,14 +204,14 @@ const TrTableUsersList = (props) => {
           </UncontrolledButtonDropdown>
         </td>
       </tr>
+      <EditUserModal  isOpen={isModalOpen}
+                      toggle={toggleModal}
+                      editUser={handleEdit}
+                      user={user} />
+
     </React.Fragment>
   );
 };
-TrTableUsersList.propTypes = {
-  id: PropTypes.node,
-};
-TrTableUsersList.defaultProps = {
-  id: "1",
-};
+
 
 export { TrTableUsersList };
