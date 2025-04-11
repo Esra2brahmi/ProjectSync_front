@@ -5,15 +5,12 @@ import { useLocation } from 'react-router-dom';
 
 const TasksList = () => {
     const location = useLocation();
-    console.log("crurrent url:",location);
     const [tasks, setTasks] = useState([]);
     const pathSegments = location.pathname.split('/');
     const projectId = pathSegments[pathSegments.length - 1];
-    console.log("Received projectId:", projectId);
 
-    useEffect(() => {
         const fetchTasks = async () => {
-            if (!projectId) return;  // Prevent fetching if projectId is missing
+            if (!projectId) return;  
     
             try {
                 const response = await fetch(`http://localhost:5197/task/byProject/${projectId}`);
@@ -24,8 +21,9 @@ const TasksList = () => {
             }
         };
     
-        fetchTasks();
-    }, [projectId]); // Add projectId as a dependency
+       useEffect(() => {
+               fetchTasks();
+           }, [projectId]);
     
 
     return (
@@ -45,7 +43,7 @@ const TasksList = () => {
                     <tbody>
                         {tasks.length > 0 ? (
                             tasks.map((task, index) => (
-                                <TrTableTasksList key={index} task={task} />
+                                <TrTableTasksList key={index} task={task} refreshTasks={fetchTasks} />
                             ))
                         ) : (
                             <tr>

@@ -103,6 +103,7 @@ import Timeline from './Pages/Timeline';
 import Icons from './Icons';
 
 import TasksList from "./Apps/Tasks/TasksList";
+import {ProjectsCardGrid} from "./components/Projects/ProjectsCardGrid"
 
 // ----------- Layout Imports ---------------
 import { DefaultNavbar } from './../layout/components/DefaultNavbar';
@@ -203,12 +204,14 @@ export const RoutedContent = () => {
             <Route component={ SessionsEdit } path="/apps/sessions-edit" />
             <Route component={ SettingsEdit } path="/apps/settings-edit" />
             <Route component={ Tasks } path="/apps/tasks/:type" />
-            <Route component={ TasksDetails } path="/apps/task-details" />
             <Route component={ TasksKanban } path="/apps/tasks-kanban" />
             <Route component={ Users } path="/apps/users/:type" />
             <Route component={ UsersResults } path="/apps/users-results" />
             <Route component={ VideosResults } path="/apps/videos-results" />
             <Route component={TasksList} path="/apps/tasks/list/:id"  />
+            <Route component={ProjectsCardGrid} path="/apps/tasks/grid/:id" />
+            <Route component={TasksDetails} path="/apps/task-details/:id" />
+
 
             { /*    Pages Routes    */ }
             <Route component={ ComingSoon } path="/pages/coming-soon" />

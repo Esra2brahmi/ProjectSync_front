@@ -1,11 +1,11 @@
 import React from "react";
-import { faker } from "@faker-js/faker";
-import { useState } from "react";
-import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import UpdateTaskModal from "../../../components/Tasks/UpdateTaskModal";
 
 import {
-  Badge,
   Avatar,
   CustomInput,
   UncontrolledButtonDropdown,
@@ -44,8 +44,66 @@ const prioStatus = [
   </React.Fragment>,
 ];
 
-const TrTableTasksList = ({ task }) => {
-  const { taskName, taskDescription, dueDate } = task;
+const TrTableTasksList = ({ task,refreshTasks }) => {
+  const { id,taskName, taskDescription, dueDate } = task;
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
+
+  const toggleUpdateModal = () => setIsUpdateModalOpen(!isUpdateModalOpen);
+
+  const handleOpenUpdateModal = () => {
+    setSelectedTask(task);
+    setTimeout(toggleUpdateModal, 0);
+  };
+
+   const handleTaskUpdated = () => {
+    refreshTasks(); 
+  };
+
+  const handleDelete = async () => {
+    toast((t) => (
+        <div>
+            <p>Are you sure you want to delete this task?</p>
+            <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+                <button
+                    onClick={async () => {
+                        toast.dismiss(t.id); // Close the toast
+                        try {
+                            await axios.delete(`http://localhost:5197/task/${id}`);
+                            toast.success("Task deleted successfully!");
+                        } catch (error) {
+                            console.error("Error deleting Task:", error);
+                            toast.error("Failed to delete Task.");
+                        }
+                    }}
+                    style={{
+                        background: "red",
+                        color: "white",
+                        border: "none",
+                        padding: "5px 10px",
+                        cursor: "pointer",
+                        borderRadius: "5px",
+                    }}
+                >
+                    Yes
+                </button>
+                <button
+                    onClick={() => toast.dismiss(t.id)}
+                    style={{
+                        background: "gray",
+                        color: "white",
+                        border: "none",
+                        padding: "5px 10px",
+                        cursor: "pointer",
+                        borderRadius: "5px",
+                    }}
+                >
+                    No
+                </button>
+            </div>
+        </div>
+    ), { duration: Infinity });
+  };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -96,12 +154,12 @@ const TrTableTasksList = ({ task }) => {
       </td>
       <td className="align-middle">
         <div>
-          <Link to="/apps/task-details" className="text-decoration-none">
-          {taskName}{/*change this to task name from backend*/}
+          <Link to={`/apps/task-details/${id}`} className="text-decoration-none">
+          {taskName}
           </Link>
         </div>
         <p className="mb-0">
-          <span className="mr-2">{taskDescription}</span>{/*change this to task description from backend*/}
+          <span className="mr-2">{taskDescription}</span>
         </p>
       </td>
       <td className="align-middle">
@@ -123,7 +181,7 @@ const TrTableTasksList = ({ task }) => {
           ]}
         />
       </td>
-      <td className="align-middle">{formatDate(dueDate)}{/*change this to due date from backend*/}</td>
+      <td className="align-middle">{formatDate(dueDate)}</td>
       <td className="align-middle text-right">
         <UncontrolledButtonDropdown className="align-self-center ml-auto">
           <DropdownToggle color="link" size="sm">
@@ -131,12 +189,12 @@ const TrTableTasksList = ({ task }) => {
             <i className="fa fa-angle-down ml-2" />
           </DropdownToggle>
           <DropdownMenu right>
-            <DropdownItem>
-              <i className="fa fa-fw fa-folder-open mr-2"></i>
-              View
+            <DropdownItem onClick={handleOpenUpdateModal}>
+              <i className="fa fa-fw fa-edit mr-2"></i>
+              Update
             </DropdownItem>
             <DropdownItem >
-              <i className="fa fa-fw fa-ticket mr-2"></i>
+              <i className="fa fa-fw fa-plus mr-2"></i>
               Add Task
             </DropdownItem>
             <DropdownItem>
@@ -144,23 +202,27 @@ const TrTableTasksList = ({ task }) => {
               Add Files
             </DropdownItem>
             <DropdownItem divider />
-            <DropdownItem>
+            <DropdownItem onClick={handleDelete}>
               <i className="fa fa-fw fa-trash mr-2"></i>
               Delete
             </DropdownItem>
           </DropdownMenu>
         </UncontrolledButtonDropdown>
       </td>
+
     </tr>
+    {selectedTask && (
+        <UpdateTaskModal 
+          isOpen={isUpdateModalOpen} 
+          toggle={toggleUpdateModal} 
+          task={selectedTask} 
+          refreshTasks={refreshTasks} 
+          onTaskUpdated={handleTaskUpdated}
+        />
+      )}
   </React.Fragment>
  );
 };
 
-TrTableTasksList.propTypes = {
-  id: PropTypes.node,
-};
-TrTableTasksList.defaultProps = {
-  id: "1",
-};
 
 export { TrTableTasksList };

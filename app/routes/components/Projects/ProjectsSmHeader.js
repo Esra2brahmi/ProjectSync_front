@@ -99,7 +99,8 @@ const ProjectsSmHeader = (props) => {
             {/* END Header Nav */}
 
             {/* Modal for Adding New Project */}
-            <AddProjectModal isOpen={isModalOpen} toggle={toggleModal} />
+            <AddProjectModal isOpen={isModalOpen} toggle={toggleModal} onProjectAdded={props.onProjectAdded} />
+
         </React.Fragment>
     );
 };
@@ -111,7 +112,8 @@ ProjectsSmHeader.propTypes = {
     linkList: PropTypes.node,
     linkGrid: PropTypes.node,
     btnShowKanban: PropTypes.bool,
-    linkKanban: PropTypes.node
+    linkKanban: PropTypes.node,
+    onProjectAdded: PropTypes.func,
 };
 
 ProjectsSmHeader.defaultProps = {
@@ -119,7 +121,8 @@ ProjectsSmHeader.defaultProps = {
     linkList: "#",
     linkGrid: "#",
     btnShowKanban: false,
-    linkKanban: "/apps/tasks-kanban"
+    linkKanban: "/apps/tasks-kanban",
+    onProjectAdded: () => {},
 };
 
 export { ProjectsSmHeader };

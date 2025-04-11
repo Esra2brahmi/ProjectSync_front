@@ -15,18 +15,33 @@ import {
   DropdownItem,
 } from "./../../../components";
 
+import UpdateProjectModal from "../Projects/UpdateProjectModal";
+
 import { randomArray, randomAvatar } from "./../../../utilities";
+const badges = ["secondary"];
 
 
 
 
-
-const ProjectsCardGrid = ({ project,index }) => {
-  const { id,projectName, supervisorFirstName, supervisorLastName, startDate, endDate, status } = project;
+const ProjectsCardGrid = ({ project,index, refreshProjects }) => {
+  const { id,projectName, supervisorFirstName, supervisorLastName, startDate, endDate, status,department } = project;
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString(); // This will display as "MM/DD/YYYY" by default
   };
+
+  const toggleUpdateModal = () => setIsUpdateModalOpen(!isUpdateModalOpen);
+
+  const handleOpenUpdateModal = () => {
+    setSelectedProject(project);
+    setTimeout(toggleUpdateModal, 0); 
+  };
+
+  const handleProjectUpdated = () => {
+    refreshProjects(); 
+  }; 
 
 
   const statusBadge = {
@@ -54,7 +69,7 @@ const ProjectsCardGrid = ({ project,index }) => {
           <a href="#" className="mr-2">
             <i className="fa fa-fw fa-star-o"></i>
           </a>
-          <Link to="/apps/tasks/grid" className="text-decoration-none">
+          <Link to={`/apps/tasks/grid/${id}`} className="text-decoration-none">
              {projectName}
           </Link>
         </div>
@@ -83,16 +98,21 @@ const ProjectsCardGrid = ({ project,index }) => {
         </div>
       </CardBody>
       <CardFooter className="d-flex">
-        <span className="align-self-center">20 Sep, Fri, 2018</span>
+        <p className="mb-0">
+                <Badge pill color={randomArray(badges)} className="mr-1">
+                    {department}
+                    {/*idk how to change this but im thinking about bagdes like genie info/indus/meca.. and get them from backend*/}
+                </Badge>
+        </p>
         <UncontrolledButtonDropdown className="align-self-center ml-auto">
           <DropdownToggle color="link" size="sm" className="pr-0">
             <i className="fa fa-gear" />
             <i className="fa fa-angle-down ml-2" />
           </DropdownToggle>
           <DropdownMenu right>
-            <DropdownItem>
-              <i className="fa fa-fw fa-folder-open mr-2"></i>
-              View
+            <DropdownItem onClick={handleOpenUpdateModal}>
+              <i className="fa fa-fw fa-edit mr-2"></i>
+              Update 
             </DropdownItem>
             <DropdownItem onClick={toggleTaskModal}>
               <i className="fa fa-fw fa-ticket mr-2" ></i>
@@ -113,6 +133,8 @@ const ProjectsCardGrid = ({ project,index }) => {
     </Card>
     {/* END Card */}
     <AddTaskModal isOpen={isTaskModalOpen} toggle={toggleTaskModal} projectId={project.id} />
+    <UpdateProjectModal isOpen={isUpdateModalOpen} toggle={toggleUpdateModal} project={selectedProject} onProjectUpdated={handleProjectUpdated}/>
+
   </React.Fragment>
  );
 };

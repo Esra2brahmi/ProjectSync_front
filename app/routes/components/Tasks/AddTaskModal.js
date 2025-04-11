@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Form, FormGroup, Label, Input } from 'reactstrap';
+import toast from 'react-hot-toast';
 
 const AddTaskModal = ({ isOpen, toggle, projectId }) => {
     const [TaskName, setTaskName] = useState('');
@@ -21,12 +22,13 @@ const AddTaskModal = ({ isOpen, toggle, projectId }) => {
             });
 
             if (response.ok) {
-                console.log('Task added successfully');
+                toast.success('Task added successfully');
             } else {
-                console.error('Failed to add task');
+                toast.error('Failed to add task');
             }
         } catch (error) {
             console.error('Error:', error);
+            toast.error('An unexpected error occurred.');
         }
 
         // Reset fields after submission

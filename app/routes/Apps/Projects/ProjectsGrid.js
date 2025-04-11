@@ -8,7 +8,6 @@ import { Paginations } from "../../components/Paginations";
 const ProjectsGrid = () => {
     const [projects, setProjects] = useState([]);
 
-    useEffect(() => {
         const fetchProjects = async () => {
             try {
                 const response = await fetch('http://localhost:5197/project');  // Adjust URL if needed
@@ -18,6 +17,7 @@ const ProjectsGrid = () => {
                 console.error('Error fetching projects:', error);
             }
         };
+        useEffect(() => {
         fetchProjects();
     }, []);
 
@@ -26,7 +26,7 @@ const ProjectsGrid = () => {
             <CardColumns>
                 {projects.length > 0 ? (
                     projects.map((project, index) => (
-                        <ProjectsCardGrid key={index} project={project} />
+                        <ProjectsCardGrid key={index} project={project} refreshProjects={fetchProjects} onProjectAdded={fetchProjects}/>
                     ))
                 ) : (
                     <div>No projects available</div> // A message if there are no projects
