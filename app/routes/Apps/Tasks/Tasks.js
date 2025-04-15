@@ -11,7 +11,7 @@ import { HeaderMain } from "../../components/HeaderMain";
 
 import TasksList from './TasksList';
 import TasksGrid from './TasksGrid';
-import { ProjectsLeftNav } from "../../components/Projects/ProjectsLeftNav";
+import { ProjectDetailLeftNav } from "../../components/Projects/ProjectDetailLeftNav";
 import { ProjectsSmHeader } from "../../components/Projects/ProjectsSmHeader";
 
 const Tasks = (props) => (
@@ -23,7 +23,7 @@ const Tasks = (props) => (
             />
             <Row>
                 <Col lg={ 3 }>
-                    <ProjectsLeftNav />
+                    <ProjectDetailLeftNav />
                 </Col>
                 <Col lg={ 9 }>
                     <ProjectsSmHeader

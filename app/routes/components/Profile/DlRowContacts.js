@@ -1,27 +1,26 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const DlRowContacts = (props) => (
+const DlRowContacts = ({ leftSideClassName, rightSideClassName, supervisor }) => (
     <React.Fragment>
         <dl className="row">
-            <dt className={ `col-sm-3 ${ props.leftSideClassName }` }>Phone</dt>
-            <dd className={ `col-sm-9 ${ props.rightSideClassName }` }>340-702-6720</dd>
-            <dt className={ `col-sm-3 ${ props.leftSideClassName }` }>Mobile</dt>
-            <dd className={ `col-sm-9 ${ props.rightSideClassName }` }>363-999-9380</dd>
-            <dt className={ `col-sm-3 ${ props.leftSideClassName }` }>Fax</dt>
-            <dd className={ `col-sm-9 ${ props.rightSideClassName }` }>727-613-5840</dd>
-            <dt className={ `col-sm-3 ${ props.leftSideClassName }` }>Email</dt>
-            <dd className={ `col-sm-9 ${ props.rightSideClassName }` }>
-                <a href="#">t.herald@gmail.com</a>
+            <dt className={ `col-sm-3 ${ leftSideClassName }` }>Phone</dt>
+            <dd className={ `col-sm-9 ${ rightSideClassName }` }>{supervisor?.phoneNumber || 'phone number not specified'}</dd>
+            <dt className={ `col-sm-3 ${ leftSideClassName }` }>Email</dt>
+            <dd className={ `col-sm-9 ${ rightSideClassName }` }>
+                {supervisor?.email || 'email not specified'}
             </dd>
-            <dt className={ `col-sm-3 ${ props.leftSideClassName }` }>Skype</dt>
-            <dd className={ `col-sm-9 ${ props.rightSideClassName }` }><a href="#">t.herald</a></dd>
         </dl>
     </React.Fragment>
 )
 DlRowContacts.propTypes = {
-    leftSideClassName: PropTypes.node,
-    rightSideClassName: PropTypes.node
+    leftSideClassName: PropTypes.string,
+  rightSideClassName: PropTypes.string,
+  supervisor: PropTypes.shape({
+    phoneNumber: PropTypes.string,
+    email: PropTypes.string,
+    // Include other supervisor properties you might use
+  }).isRequired
 };
 DlRowContacts.defaultProps = {
     leftSideClassName: "text-right",

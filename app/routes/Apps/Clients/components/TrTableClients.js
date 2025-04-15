@@ -17,24 +17,24 @@ const status = ["secondary", "success", "warning", "danger"];
 
 const tag = ["secondary", "primary", "info"];
 
-const TrTableClients = (props) => (
+const TrTableClients = ({ id, firstName, lastName, email, phoneNumber,academicTitle ,onClick,isSelected}) => (
   <React.Fragment>
-    <tr>
+    <tr onClick={onClick}>
       <td className="align-middle">
         <CustomInput
           type="checkbox"
-          id={`trTableClients-${props.id}`}
+          id={`trTableClients-${id}`}
           label=""
           inline
         />
       </td>
       <td className="align-middle">
-        <a href="#" id={`trTableClientsTooltip-${props.id}`}>
+        <a href="#" id={`trTableClientsTooltip-${id}`}>
           <i className="fa fa-fw fa-star-o"></i>
         </a>
         <UncontrolledTooltip
           placement="top"
-          target={`trTableClientsTooltip-${props.id}`}
+          target={`trTableClientsTooltip-${id}`}
         >
           Add To Favorites
         </UncontrolledTooltip>
@@ -61,14 +61,14 @@ const TrTableClients = (props) => (
           </Media>
           <Media body>
             <a className="mt-0 d-flex text-decoration-none" href="#">
-              {faker.person.firstName()} {faker.person.lastName()}
+              {firstName} {lastName}
             </a>
-            <span>{faker.person.jobTitle()}</span>
+            <span>{academicTitle}</span>
           </Media>
         </Media>
       </td>
-      <td className="align-middle">{faker.internet.email()}</td>
-      <td className="align-middle">{faker.phone.number()}</td>
+      <td className="align-middle">{email}</td>
+      <td className="align-middle">{phoneNumber}</td>
       <td className="align-middle text-right">
         <Badge pill color={randomArray(tag)}>
           {faker.commerce.department()}
@@ -79,9 +79,17 @@ const TrTableClients = (props) => (
 );
 TrTableClients.propTypes = {
   id: PropTypes.node,
+  firstName: PropTypes.string,
+  lastName: PropTypes.string,
+  email: PropTypes.string,
+  phoneNumber: PropTypes.string,
+  academicTitle: PropTypes.string,
+  onClick: PropTypes.func,
+  isSelected: PropTypes.bool
 };
 TrTableClients.defaultProps = {
   id: "1",
+  isSelected: false
 };
 
 export { TrTableClients };

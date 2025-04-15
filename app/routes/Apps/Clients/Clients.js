@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { faker } from "@faker-js/faker";
-
+import AddSupervisorModal from "./AddSupervisorModal";
+import UpdateSupervisorModal from "./UpdateSupervisorModal";
 import {
   Container,
   Row,
@@ -30,7 +32,71 @@ import { DlRowAddress } from "../../components/Profile/DlRowAddress";
 import { TrTableClients } from "./components/TrTableClients";
 import { TrTableCompanies } from "./components/TrTableCompanies";
 
-const Clients = () => (
+const Clients = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [supervisors, setSupervisors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedSupervisor, setSelectedSupervisor] = useState(null); 
+  const [departments, setDepartments] = useState([]);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+
+  useEffect(() => {
+    fetchSupervisors();
+  }, []);
+
+  const fetchSupervisors = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get("http://localhost:5197/api/Supervisor");
+      setSupervisors(response.data);
+    } catch (error) {
+      console.error("Error fetching supervisors:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+   const handleAddSupervisor = async (supervisorData) => {
+    try {
+      await axios.post("http://localhost:5197/api/Supervisor", supervisorData);
+      await fetchSupervisors(); 
+    } catch (error) {
+      console.error("Error adding supervisor:", error);
+    }
+  };
+
+  useEffect(() => {
+  const fetchDepartments = async () => {
+    try {
+      const response = await axios.get("http://localhost:5197/api/Departments");
+      console.log(response.data);
+      setDepartments(response.data);
+    } catch (error) {
+      console.error("Error fetching departments:", error);
+    }
+  };
+  
+  fetchDepartments();
+}, []);
+
+  // get department name by ID
+const getDepartmentName = (id) => {
+  const department = departments.find(d => d.id === id);
+  return department ? department.name : `Department ${id}`;
+};
+
+const handleUpdateSupervisor = async (updatedData) => {
+  try {
+    await axios.put(`http://localhost:5197/api/Supervisor/${updatedData.id}`, updatedData);
+    await fetchSupervisors(); // Refresh the list
+  } catch (error) {
+    console.error("Error updating supervisor:", error);
+  }
+};
+
+
+
+return (
   <React.Fragment>
     <Container>
       <HeaderMain title="Clients" className="mb-5 mt-4" />
@@ -44,7 +110,7 @@ const Clients = () => (
                   <Nav pills>
                     <NavItem>
                       <UncontrolledTabs.NavLink tabId="clients">
-                        Clients
+                        Supervisors
                       </UncontrolledTabs.NavLink>
                     </NavItem>
                     <NavItem>
@@ -68,6 +134,7 @@ const Clients = () => (
                         color="primary"
                         className="align-self-center"
                         id="tooltipAddNew"
+                        onClick={() => setIsModalOpen(true)}
                       >
                         <i className="fa fa-fw fa-plus"></i>
                       </Button>
@@ -100,16 +167,29 @@ const Clients = () => (
                       </tr>
                     </thead>
                     <tbody>
-                      <TrTableClients />
-                      <TrTableClients id="2" />
-                      <TrTableClients id="3" />
-                      <TrTableClients id="4" />
-                      <TrTableClients id="5" />
-                      <TrTableClients id="6" />
-                      <TrTableClients id="7" />
-                      <TrTableClients id="8" />
-                      <TrTableClients id="9" />
-                    </tbody>
+                        {loading ? (
+                          <tr>
+                            <td colSpan="6" className="text-center">
+                              Loading...
+                            </td>
+                          </tr>
+                        ) : (
+                          supervisors.map((supervisor) => (
+                            <TrTableClients 
+                              key={supervisor.id}
+                              id={supervisor.id}
+                              firstName={supervisor.firstName}
+                              lastName={supervisor.lastName}
+                              email={supervisor.email}
+                              phoneNumber={supervisor.phoneNumber}
+                              academicTitle={supervisor.academicTitle}
+                              address={supervisor.address}
+                              onClick={() => setSelectedSupervisor(supervisor)}
+                              isSelected={selectedSupervisor?.id === supervisor.id}
+                            />
+                          ))
+                        )}
+                      </tbody>
                   </Table>
                   {/* END Table */}
                 </TabPane>
@@ -178,9 +258,10 @@ const Clients = () => (
           </Card>
         </Col>
         <Col lg={4}>
+         {selectedSupervisor && (
           <Card>
             <CardBody>
-              <Profile />
+              <Profile supervisor={selectedSupervisor} />
               <div className="text-center pb-1">
                 <ul className="list-inline">
                   <li className="list-inline-item text-center">
@@ -204,32 +285,34 @@ const Clients = () => (
                   </Button>
                 </Col>
                 <Col sm={6}>
-                  <Button color="secondary" outline block>
+                  <Button color="secondary" outline block onClick={() => setIsUpdateModalOpen(true)}>
                     Edit
                   </Button>
                 </Col>
               </Row>
               <div className="mt-4 mb-2">
-                <span className="small">Profile</span>
+                <span className="small">Description</span>
               </div>
               <p className="text-left">
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dicta
-                sapiente earum, necessitatibus commodi eius pariatur repudiandae
-                cum sunt officiis ex!
+                {selectedSupervisor?.description || 'No description available'}
               </p>
               <div className="mt-4 mb-2">
-                <span className="small">Labels</span>
+                <span className="small">Departments</span>
               </div>
               <div className="text-left mb-4">
-                <Badge pill color="primary" className="mr-1">
-                  {faker.commerce.department()}
-                </Badge>
-                <Badge pill color="secondary" className="mr-1">
-                  {faker.commerce.department()}
-                </Badge>
-                <Badge pill color="primary" className="mr-1">
-                  {faker.commerce.department()}
-                </Badge>
+                {selectedSupervisor?.departmentIds?.map((departmentId) => (
+                  <Badge 
+                    key={departmentId} 
+                    pill 
+                    color={departmentId % 2 === 0 ? "primary" : "secondary"} 
+                    className="mr-1"
+                  >
+                    {getDepartmentName(departmentId)}
+                  </Badge>
+                ))}
+                {(!selectedSupervisor?.departmentIds || selectedSupervisor.departmentIds.length === 0) && (
+                  <span className="text-muted">No departments assigned</span>
+                )}
               </div>
               <div className="mt-4 mb-2">
                 <span className="small">Contact</span>
@@ -237,6 +320,7 @@ const Clients = () => (
               <DlRowContacts
                 leftSideClassName="text-left"
                 rightSideClassName="text-right text-inverse"
+                supervisor={selectedSupervisor}
               />
               <div className="mt-4 mb-2">
                 <span className="small">Address</span>
@@ -244,14 +328,29 @@ const Clients = () => (
               <DlRowAddress
                 leftSideClassName="text-left"
                 rightSideClassName="text-right text-inverse"
+                supervisor={selectedSupervisor}
               />
             </CardBody>
           </Card>
+           )}
         </Col>
       </Row>
       {/* END Content */}
     </Container>
+    <AddSupervisorModal
+        isOpen={isModalOpen}
+        toggle={() => setIsModalOpen(!isModalOpen)}
+        onAddSupervisor={handleAddSupervisor}
+      />
+    <UpdateSupervisorModal
+  isOpen={isUpdateModalOpen}
+  toggle={() => setIsUpdateModalOpen(!isUpdateModalOpen)}
+  supervisor={selectedSupervisor}
+  onUpdateSupervisor={handleUpdateSupervisor}
+/>
   </React.Fragment>
 );
+
+};
 
 export default Clients;

@@ -89,73 +89,7 @@ const ProjectsLeftNav = () => (
       </Nav>
     </div>
     {/* END Left Nav  */}
-    {/* START Left Nav  */}
-    <div className="mb-4">
-      <div className="small mb-3">People</div>
-      <Nav pills vertical>
-        <NavItem>
-          <NavLink href="#" className="d-flex">
-            <Media>
-              <Media left middle className="mr-3 align-self-center">
-                <Avatar.Image size="md" src={randomAvatar()} />
-              </Media>
-              <Media body>
-                <div className="mt-0">
-                  {faker.person.firstName()} {faker.person.lastName()}
-                </div>
-                <span className="small">
-                  {faker.location.state()}, {faker.location.stateAbbr()}
-                </span>
-              </Media>
-            </Media>
-            <i className="fa fa-fw fa-circle text-success ml-auto align-self-center ml-2"></i>
-          </NavLink>
-        </NavItem>
-        <NavItem>
-          <NavLink href="#" className="d-flex">
-            <Media>
-              <Media left middle className="mr-3 align-self-center">
-                <Avatar.Image size="md" src={randomAvatar()} />
-              </Media>
-              <Media body>
-                <div className="mt-0">
-                  {faker.person.firstName()} {faker.person.lastName()}
-                </div>
-                <span className="small">
-                  {faker.location.state()}, {faker.location.stateAbbr()}
-                </span>
-              </Media>
-            </Media>
-            <i className="fa fa-fw fa-circle text-warning ml-auto align-self-center ml-2"></i>
-          </NavLink>
-        </NavItem>
-        <NavItem>
-          <NavLink href="#" className="d-flex">
-            <Media>
-              <Media left middle className="mr-3 align-self-center">
-                <Avatar.Image size="md" src={randomAvatar()} />
-              </Media>
-              <Media body>
-                <div className="mt-0">
-                  {faker.person.firstName()} {faker.person.lastName()}
-                </div>
-                <span className="small">
-                  {faker.location.state()}, {faker.location.stateAbbr()}
-                </span>
-              </Media>
-            </Media>
-            <i className="fa fa-fw fa-circle text-danger ml-auto align-self-center ml-2"></i>
-          </NavLink>
-        </NavItem>
-        <NavItem>
-          <NavLink href="#">
-            <i className="fa fa-fw fa-plus mr-2"></i>
-            Add New People
-          </NavLink>
-        </NavItem>
-      </Nav>
-    </div>
-    {/* END Left Nav  */}
+    
   </React.Fragment>
 );
 
