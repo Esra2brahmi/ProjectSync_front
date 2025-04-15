@@ -58,11 +58,11 @@ const AddUserModal=({ isOpen, toggle })=>{
                             <Input type="text" placeholder='user FirstName' id="userFirstName" value={userFirstName} onChange={(e) => setUserFirstName(e.target.value)}  />
                         </FormGroup>
                         <FormGroup>
-                            <Label for="userLastName">Supervisor First Name</Label>
+                            <Label for="userLastName">User LastName</Label>
                             <Input type="text"placeholder='user LastName' id="userLastName" value={userLastName} onChange={(e) => setUserLastName(e.target.value)} />
                         </FormGroup>
                         <FormGroup>
-                            <Label for="department">Supervisor Last Name</Label>
+                            <Label for="department">Department </Label>
                             <Input type="select" id="department" value={department} onChange={(e) => setDepartment(e.target.value)}>
                                 <option>Computer Science Engineering</option>
                                 <option>Electrical Engineering</option>

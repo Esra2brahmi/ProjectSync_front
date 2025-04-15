@@ -9,6 +9,7 @@ import {
   UncontrolledTooltip,
   AvatarAddOn,
   Media,
+  Button
 } from "./../../../../components";
 
 import { randomArray } from "./../../../../utilities";
@@ -70,9 +71,12 @@ const TrTableClients = ({ id, firstName, lastName, email, phoneNumber,academicTi
       <td className="align-middle">{email}</td>
       <td className="align-middle">{phoneNumber}</td>
       <td className="align-middle text-right">
-        <Badge pill color={randomArray(tag)}>
-          {faker.commerce.department()}
-        </Badge>
+       <Button color="link"
+              className="align-self-center mr-2 text-decoration-none"
+              id="tooltipSettings"
+              >
+              <i className="fa fa-fw fa-gear"></i>
+              </Button>
       </td>
     </tr>
   </React.Fragment>

@@ -75,12 +75,11 @@ const Clients = () => {
       console.error("Error fetching departments:", error);
     }
   };
-  
   fetchDepartments();
 }, []);
 
   // get department name by ID
-const getDepartmentName = (id) => {
+  const getDepartmentName = (id) => {
   const department = departments.find(d => d.id === id);
   return department ? department.name : `Department ${id}`;
 };
@@ -94,7 +93,16 @@ const handleUpdateSupervisor = async (updatedData) => {
   }
 };
 
-
+const updateDepartment = (updatedDepartment) => {
+  setDepartments((prevDepartment) =>
+    prevDepartment.map((department) =>
+      department.id === updatedDepartment.id ? updatedDepartment : department
+    )
+  );
+};
+const handleDeleteDepartment = (id) => {
+  setDepartments((prevDepartment) => prevDepartment.filter((dep) => dep.id !== id));
+};
 
 return (
   <React.Fragment>
@@ -109,26 +117,17 @@ return (
                 <div className="d-flex">
                   <Nav pills>
                     <NavItem>
-                      <UncontrolledTabs.NavLink tabId="clients">
+                      <UncontrolledTabs.NavLink tabId="supervisors">
                         Supervisors
                       </UncontrolledTabs.NavLink>
                     </NavItem>
                     <NavItem>
-                      <UncontrolledTabs.NavLink tabId="companies">
-                        Companies
+                      <UncontrolledTabs.NavLink tabId="departments">
+                        Departments
                       </UncontrolledTabs.NavLink>
                     </NavItem>
                   </Nav>
                   <ButtonToolbar className="ml-auto">
-                    <ButtonGroup>
-                      <Button
-                        color="link"
-                        className="align-self-center mr-2 text-decoration-none"
-                        id="tooltipSettings"
-                      >
-                        <i className="fa fa-fw fa-gear"></i>
-                      </Button>
-                    </ButtonGroup>
                     <ButtonGroup>
                       <Button
                         color="primary"
@@ -153,7 +152,7 @@ return (
               </CardBody>
 
               <UncontrolledTabs.TabContent>
-                <TabPane tabId="clients">
+                <TabPane tabId="supervisors">
                   {/* START Table */}
                   <Table className="mb-0" hover responsive>
                     <thead>
@@ -163,7 +162,7 @@ return (
                         <th className="bt-0">Name</th>
                         <th className="bt-0">Email</th>
                         <th className="text-right bt-0">Phone</th>
-                        <th className="text-right bt-0">Label</th>
+                        <th className="align-middle bt-0 text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -193,7 +192,7 @@ return (
                   </Table>
                   {/* END Table */}
                 </TabPane>
-                <TabPane tabId="companies">
+                <TabPane tabId="departments">
                   {/* START Table */}
                   <Table className="mb-0" hover responsive>
                     <thead>
@@ -201,24 +200,31 @@ return (
                         <th className="bt-0"></th>
                         <th className="bt-0"></th>
                         <th className="bt-0">Name</th>
-                        <th className="bt-0">PM</th>
-                        <th className="text-right bt-0">Phone</th>
-                        <th className="text-right bt-0">Label</th>
+                        <th className="bt-0">ChairName</th>
+                        <th className="text-right bt-0">phoneNumber</th>
+                        <th className="text-right bt-0">Email</th>
+                        <th className="text-right bt-0">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <TrTableCompanies />
-                      <TrTableCompanies id="2" />
-                      <TrTableCompanies id="3" />
-                      <TrTableCompanies id="4" />
-                      <TrTableCompanies id="5" />
-                      <TrTableCompanies id="6" />
-                      <TrTableCompanies id="7" />
-                      <TrTableCompanies id="8" />
-                      <TrTableCompanies id="9" />
-                      <TrTableCompanies id="10" />
-                      <TrTableCompanies id="11" />
-                      <TrTableCompanies id="12" />
+                    {loading ? (
+                          <tr>
+                            <td colSpan="6" className="text-center">
+                              Loading...
+                            </td>
+                          </tr>
+                        ) : (
+                          departments.map((department,index) => (
+                            <TrTableCompanies
+                              key={index}
+                              department={department}
+                              onDeleteDepartment={handleDeleteDepartment} 
+                              updateDepartment={updateDepartment}
+                            />
+                          ))
+                        )}
+                     
+                      
                     </tbody>
                   </Table>
                   {/* END Table */}

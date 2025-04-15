@@ -206,7 +206,7 @@ const TrTableUsersList = ({ user,index, onDeleteUser,updateUser }) => {
       </tr>
       <EditUserModal  isOpen={isModalOpen}
                       toggle={toggleModal}
-                      editUser={handleEdit}
+                      editDepartment={handleEdit}
                       user={user} />
 
     </React.Fragment>

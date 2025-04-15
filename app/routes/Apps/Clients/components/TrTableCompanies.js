@@ -1,204 +1,103 @@
-import React from "react";
+import React ,{useState,useEffect} from "react";
 import { faker } from "@faker-js/faker";
 import PropTypes from "prop-types";
-
+import UpdateDepartmentModal from "../UpdateDepartmentModal";
 import {
   Avatar,
   CustomInput,
   UncontrolledTooltip,
   AvatarAddOn,
   Media,
+  UncontrolledButtonDropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem,
 } from "./../../../../components";
 import { randomArray } from "./../../../../utilities";
-
+const TrTableCompanies = ({department,index, onDeleteDepartment,updateDepartment}) => {
+ const {id,name,chairName,phoneNumber,email}=department;
 const status = ["success", "danger", "warning", "secondary"];
+const tag = ["secondary", "primary", "info"];
+const [isSelected, setIsSelected] = useState(false);
+const [isModalOpen, setModalOpen] = useState(false);
+ const toggleModal = () => setModalOpen(!isModalOpen);
+ const handleCheckboxChange = () => {setIsSelected(!isSelected);};
+ //method for editing the user
+ const handleEdit=async(updatedDepartment)=>{
+  if(isSelected){
+    try{
+      const response=await fetch(`http://localhost:5197/api/Departments/${id}`,{
+        method:"PUT",
+        headers: {
+          "Content-Type": "application/json",//Indique au serveur que tu envoies du JSON
+        },
+        body:JSON.stringify(updatedDepartment)//convertit l'objet updatedUser en JSON
+      });
+      if (response.ok) {
+        console.log("Department edited successfully");
+        updateDepartment(updatedDepartment);
+        setIsSelected(false)
+      } else {
+        console.error("Error editing Department", response);
+       
+      }
+    } catch (error) {
+      console.error("Error editing user:", error);
+    }
+  }
+};
+ //method for deleting Department
+ const handleDelete = async () => {
+  if (isSelected) {
+    try {
+      const response = await fetch(`http://localhost:5197/api/Departments/${id}`, {
+        method: "DELETE",  // Utilisation de la méthode DELETE pour supprimer
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+        if (response.ok) {
+          onDeleteDepartment(id); 
+      } else {
+        console.error("Error deleting Department", response);
+       
+      }
+    } catch (error) {
+      console.error("Error deleting user:", error);
+    }
+  }
+};
+return(
 
-const brand = [
-  <Media key="facebook">
-    <Media left className="align-self-center mr-3">
-      <span className="fa-stack fa-lg">
-        <i className="fa fa-stop fa-stack-2x text-facebook"></i>
-        <i className="fa fa-facebook fa-stack-1x fa-inverse"></i>
-      </span>
-    </Media>
-    <Media body>
-      <div className="text-inverse mt-0 d-flex">Facebook</div>
-      <span>{faker.location.country()}</span>
-    </Media>
-  </Media>,
-  <Media key="twitter">
-    <Media left className="align-self-center mr-3">
-      <span className="fa-stack fa-lg">
-        <i className="fa fa-stop fa-stack-2x text-twitter"></i>
-        <i className="fa fa-twitter fa-stack-1x fa-inverse"></i>
-      </span>
-    </Media>
-    <Media body>
-      <div className="text-inverse  mt-0 d-flex">Twitter</div>
-      <span>{faker.location.country()}</span>
-    </Media>
-  </Media>,
-  <Media key="linkedin">
-    <Media left className="align-self-center mr-3">
-      <span className="fa-stack fa-lg">
-        <i className="fa fa-stop fa-stack-2x text-linkedin"></i>
-        <i className="fa fa-linkedin fa-stack-1x fa-inverse"></i>
-      </span>
-    </Media>
-    <Media body>
-      <div className="text-inverse  mt-0 d-flex">Linkedin</div>
-      <span>{faker.location.country()}</span>
-    </Media>
-  </Media>,
-  <Media key="foursquare">
-    <Media left className="align-self-center mr-3">
-      <span className="fa-stack fa-lg">
-        <i className="fa fa-stop fa-stack-2x text-foursquare"></i>
-        <i className="fa fa-foursquare fa-stack-1x fa-inverse"></i>
-      </span>
-    </Media>
-    <Media body>
-      <div className="text-inverse  mt-0 d-flex">Foursquare</div>
-      <span>{faker.location.country()}</span>
-    </Media>
-  </Media>,
-  <Media key="lastfm">
-    <Media left className="align-self-center mr-3">
-      <span className="fa-stack fa-lg">
-        <i className="fa fa-stop fa-stack-2x text-lastfm"></i>
-        <i className="fa fa-lastfm fa-stack-1x fa-inverse"></i>
-      </span>
-    </Media>
-    <Media body>
-      <div className="text-inverse  mt-0 d-flex">LastFM</div>
-      <span>{faker.location.country()}</span>
-    </Media>
-  </Media>,
-  <Media key="paypal">
-    <Media left className="align-self-center mr-3">
-      <span className="fa-stack fa-lg">
-        <i className="fa fa-stop fa-stack-2x text-paypal"></i>
-        <i className="fa fa-paypal fa-stack-1x fa-inverse"></i>
-      </span>
-    </Media>
-    <Media body>
-      <div className="text-inverse  mt-0 d-flex">PayPal</div>
-      <span>{faker.location.country()}</span>
-    </Media>
-  </Media>,
-  <Media key="amazon">
-    <Media left className="align-self-center mr-3">
-      <span className="fa-stack fa-lg">
-        <i className="fa fa-stop fa-stack-2x text-amazon"></i>
-        <i className="fa fa-amazon fa-stack-1x fa-inverse"></i>
-      </span>
-    </Media>
-    <Media body>
-      <div className="text-inverse  mt-0 d-flex">Amazon</div>
-      <span>{faker.location.country()}</span>
-    </Media>
-  </Media>,
-  <Media key="skype">
-    <Media left className="align-self-center mr-3">
-      <span className="fa-stack fa-lg">
-        <i className="fa fa-stop fa-stack-2x text-skype"></i>
-        <i className="fa fa-skype fa-stack-1x fa-inverse"></i>
-      </span>
-    </Media>
-    <Media body>
-      <div className="text-inverse  mt-0 d-flex">Skype</div>
-      <span>{faker.location.country()}</span>
-    </Media>
-  </Media>,
-  <Media key="spotify">
-    <Media left className="align-self-center mr-3">
-      <span className="fa-stack fa-lg">
-        <i className="fa fa-stop fa-stack-2x text-spotify"></i>
-        <i className="fa fa-spotify fa-stack-1x fa-inverse"></i>
-      </span>
-    </Media>
-    <Media body>
-      <div className="text-inverse  mt-0 d-flex">Spotify</div>
-      <span>{faker.location.country()}</span>
-    </Media>
-  </Media>,
-  <Media key="pinterest">
-    <Media left className="align-self-center mr-3">
-      <span className="fa-stack fa-lg">
-        <i className="fa fa-stop fa-stack-2x text-pinterest"></i>
-        <i className="fa fa-pinterest fa-stack-1x fa-inverse"></i>
-      </span>
-    </Media>
-    <Media body>
-      <div className="text-inverse  mt-0 d-flex">Pinterest</div>
-      <span>{faker.location.country()}</span>
-    </Media>
-  </Media>,
-  <Media key="windows">
-    <Media left className="align-self-center mr-3">
-      <span className="fa-stack fa-lg">
-        <i className="fa fa-stop fa-stack-2x text-windows"></i>
-        <i className="fa fa-windows fa-stack-1x fa-inverse"></i>
-      </span>
-    </Media>
-    <Media body>
-      <div className="text-inverse  mt-0 d-flex">Windows</div>
-      <span>{faker.location.country()}</span>
-    </Media>
-  </Media>,
-  <Media key="android">
-    <Media left className="align-self-center mr-3">
-      <span className="fa-stack fa-lg">
-        <i className="fa fa-stop fa-stack-2x text-android"></i>
-        <i className="fa fa-android fa-stack-1x fa-inverse"></i>
-      </span>
-    </Media>
-    <Media body>
-      <div className="text-inverse  mt-0 d-flex">Android</div>
-      <span>{faker.location.country()}</span>
-    </Media>
-  </Media>,
-  <Media key="medium">
-    <Media left className="align-self-center mr-3">
-      <span className="fa-stack fa-lg">
-        <i className="fa fa-stop fa-stack-2x text-medium"></i>
-        <i className="fa fa-medium fa-stack-1x fa-inverse"></i>
-      </span>
-    </Media>
-    <Media body>
-      <div className="text-inverse  mt-0 d-flex">Medium</div>
-      <span>{faker.location.country()}</span>
-    </Media>
-  </Media>,
-];
-
-const TrTableCompanies = (props) => (
   <React.Fragment>
     <tr>
       <td className="align-middle">
         <CustomInput
           type="checkbox"
-          id={`trTableCompanies-${props.id}`}
+          id={`trTableCompanies-${id}`}
           label=""
           inline
+          checked={isSelected}
+          onChange={handleCheckboxChange}
         />
       </td>
       <td className="align-middle">
-        <a href="#" id={`trTableCompaniesTooltip-${props.id}`}>
+        <a href="#" id={`trTableCompaniesTooltip-${id}`}>
           <i className="fa fa-fw fa-star-o"></i>
         </a>
         <UncontrolledTooltip
           placement="top"
-          target={`trTableCompaniesTooltip-${props.id}`}
+          target={`trTableCompaniesTooltip-${id}`}
         >
           Add To Favorites
         </UncontrolledTooltip>
       </td>
-      <td className="align-middle">{randomArray(brand)}</td>
+      <td className="align-middle">{name}</td>
       <td className="align-middle">
         <Avatar.Image
           size="sm"
           src="http://bs4.webkom.co/img/avatars/2.jpg"
+          
           className="mr-2"
           addOns={[
             <AvatarAddOn.Icon
@@ -213,26 +112,42 @@ const TrTableCompanies = (props) => (
             />,
           ]}
         />
+        {chairName}
+      </td>
+      <td  className="align-middle text-right">
+      {phoneNumber}
       </td>
       <td className="align-middle text-right">
-        {faker.phone.number()}
-        <br />
-        {faker.internet.email()}
+        {email}
       </td>
       <td className="align-middle text-right">
-        {faker.location.streetAddress()}
-        <br />
-        {faker.location.city()}
-      </td>
-    </tr>
+          <UncontrolledButtonDropdown>
+            <DropdownToggle color="link" className="pr-0">
+              <i className="fa fa-bars"></i>
+              <i className="fa fa-angle-down ml-2" />
+            </DropdownToggle>
+            <DropdownMenu right>
+              <DropdownItem onClick={toggleModal}>
+                <i className="fa fa-fw fa-pencil mr-2"></i>
+                Edit
+              </DropdownItem>
+              <DropdownItem divider />
+              <DropdownItem onClick={handleDelete}>
+                <i className="fa fa-fw fa-trash mr-2"></i>
+                Delete
+              </DropdownItem>
+            </DropdownMenu>
+          </UncontrolledButtonDropdown>
+        </td>
+      </tr>
+      <UpdateDepartmentModal  isOpen={isModalOpen}
+                      toggle={toggleModal}
+                      editDepartment={handleEdit}
+                      department={department} />
+   
   </React.Fragment>
-);
+)};
 
-TrTableCompanies.propTypes = {
-  id: PropTypes.node,
-};
-TrTableCompanies.defaultProps = {
-  id: "1",
-};
+
 
 export { TrTableCompanies };
