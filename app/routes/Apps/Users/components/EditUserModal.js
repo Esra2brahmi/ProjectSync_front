@@ -39,15 +39,15 @@ const EditUserModal=({isOpen, toggle, editUser, user})=>{
           };
     return(
         <Modal isOpen={isOpen} toggle={toggle} >
-            <ModalHeader toggle={toggle}>Edit the user User</ModalHeader>
+            <ModalHeader toggle={toggle}>Edit Student</ModalHeader>
                 <ModalBody>
                     <Form>
                         <FormGroup>
-                            <Label for="userFirstName">User FirstName</Label>
+                            <Label for="userFirstName">Student First Name</Label>
                             <Input type="text" placeholder='user FirstName' id="userFirstName" value={userFirstName} onChange={(e) => setUserFirstName(e.target.value)}  />
                         </FormGroup>
                         <FormGroup>
-                            <Label for="userLastName">Supervisor First Name</Label>
+                            <Label for="userLastName">Student Last Name</Label>
                             <Input type="text"placeholder='user LastName' id="userLastName" value={userLastName} onChange={(e) => setUserLastName(e.target.value)} />
                         </FormGroup>
                         <FormGroup>

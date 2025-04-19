@@ -70,14 +70,7 @@ const TrTableClients = ({ id, firstName, lastName, email, phoneNumber,academicTi
       </td>
       <td className="align-middle">{email}</td>
       <td className="align-middle">{phoneNumber}</td>
-      <td className="align-middle text-right">
-       <Button color="link"
-              className="align-self-center mr-2 text-decoration-none"
-              id="tooltipSettings"
-              >
-              <i className="fa fa-fw fa-gear"></i>
-              </Button>
-      </td>
+      <td className="align-middle text-right"></td>
     </tr>
   </React.Fragment>
 );

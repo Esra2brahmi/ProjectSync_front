@@ -85,16 +85,16 @@ const TrTableUsersList = ({ user,index, onDeleteUser,updateUser }) => {
     ],
   ];
   const handleCheckboxChange = () => {setIsSelected(!isSelected);};
-  //method for editing the user
+  
   const handleEdit=async(updatedUser)=>{
     if(isSelected){
       try{
         const response=await fetch(`http://localhost:5197/user/${id}`,{
           method:"PUT",
           headers: {
-            "Content-Type": "application/json",//Indique au serveur que tu envoies du JSON
+            "Content-Type": "application/json",
           },
-          body:JSON.stringify(updatedUser)//convertit l'objet updatedUser en JSON
+          body:JSON.stringify(updatedUser)
         });
         if (response.ok) {
           console.log("User edited successfully");
@@ -109,12 +109,12 @@ const TrTableUsersList = ({ user,index, onDeleteUser,updateUser }) => {
       }
     }
   };
-  //method for deleting user
+  
   const handleDelete = async () => {
     if (isSelected) {
       try {
         const response = await fetch(`http://localhost:5197/user/${id}`, {
-          method: "DELETE",  // Utilisation de la méthode DELETE pour supprimer
+          method: "DELETE",  
           headers: {
             "Content-Type": "application/json",
           },
@@ -176,18 +176,6 @@ const TrTableUsersList = ({ user,index, onDeleteUser,updateUser }) => {
             </DropdownToggle>
             <DropdownMenu right>
               <DropdownItem>
-                <i className="fa fa-fw fa-phone mr-2"></i>
-                Call
-              </DropdownItem>
-              <DropdownItem>
-                <i className="fa fa-fw fa-comment mr-2"></i>
-                Chat
-              </DropdownItem>
-              <DropdownItem>
-                <i className="fa fa-fw fa-video-camera mr-2"></i>
-                Video
-              </DropdownItem>
-              <DropdownItem>
                 <i className="fa fa-fw fa-user mr-2"></i>
                 Profile
               </DropdownItem>
@@ -206,7 +194,7 @@ const TrTableUsersList = ({ user,index, onDeleteUser,updateUser }) => {
       </tr>
       <EditUserModal  isOpen={isModalOpen}
                       toggle={toggleModal}
-                      editDepartment={handleEdit}
+                      editUser={handleEdit}
                       user={user} />
 
     </React.Fragment>

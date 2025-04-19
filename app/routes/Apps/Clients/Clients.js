@@ -141,13 +141,7 @@ return (
                   </ButtonToolbar>
                   <UncontrolledTooltip placement="right" target="tooltipAddNew">
                     Add New
-                  </UncontrolledTooltip>
-                  <UncontrolledTooltip
-                    placement="right"
-                    target="tooltipSettings"
-                  >
-                    Settings
-                  </UncontrolledTooltip>
+                 </UncontrolledTooltip >
                 </div>
               </CardBody>
 
