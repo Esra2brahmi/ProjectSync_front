@@ -12,7 +12,8 @@ import {
   Dropdown,
   DropdownToggle,
   DropdownMenu,
-  DropdownItem
+  DropdownItem,
+  Alert
 } from "./../../../components";
 import { randomAvatar } from "./../../../utilities";
 
@@ -20,6 +21,7 @@ const ProjectDetailLeftNav = ({ projectId }) => {
   const [allSupervisors, setAllSupervisors] = useState([]);
   const [projectSupervisors, setProjectSupervisors] = useState([]);
   const [students, setStudents] = useState([]);
+  const [projectStudents, setProjectStudents] = useState([]);
   const [selectedStudents, setSelectedStudents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState({
@@ -30,6 +32,8 @@ const ProjectDetailLeftNav = ({ projectId }) => {
     supervisors: false,
     students: false
   });
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
 
   // Fetch project supervisors when component mounts
   useEffect(() => {
@@ -54,6 +58,29 @@ const ProjectDetailLeftNav = ({ projectId }) => {
     fetchProjectSupervisors();
   }, [projectId]);
 
+  // Fetch project students when component mounts
+  useEffect(() => {
+    const fetchProjectStudents = async () => {
+      if (!projectId) return;
+      
+      setLoading(prev => ({ ...prev, students: true }));
+      try {
+        const response = await fetch(`http://localhost:5197/api/ProjectUser/project/${projectId}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch project students");
+        }
+        const data = await response.json();
+        setProjectStudents(data);
+      } catch (error) {
+        console.error("Error fetching project students:", error);
+      } finally {
+        setLoading(prev => ({ ...prev, students: false }));
+      }
+    };
+
+    fetchProjectStudents();
+  }, [projectId]);
+
   // Fetch all supervisors for dropdown
   useEffect(() => {
     const fetchSupervisors = async () => {
@@ -72,7 +99,7 @@ const ProjectDetailLeftNav = ({ projectId }) => {
     fetchSupervisors();
   }, []);
 
-  // Fetch students from API
+  // Fetch students from API for dropdown
   useEffect(() => {
     const fetchStudents = async () => {
       setLoading(prev => ({ ...prev, students: true }));
@@ -110,6 +137,12 @@ const ProjectDetailLeftNav = ({ projectId }) => {
       });
 
       if (!response.ok) {
+        if (response.status === 400) {
+          setAlertMessage("This supervisor is already assigned to this project");
+          setShowAlert(true);
+          setTimeout(() => setShowAlert(false), 3000);
+          return;
+        }
         throw new Error("Failed to add supervisor");
       }
 
@@ -127,14 +160,43 @@ const ProjectDetailLeftNav = ({ projectId }) => {
     }
   };
 
-  const handleAddStudent = (student, e) => {
+  const handleAddStudent = async (student, e) => {
     e.preventDefault();
-    e.stopPropagation(); 
-    setDropdownOpen(prev => ({ ...prev, student: false }));
-    if (!selectedStudents.some(s => s.id === student.id)) {
-      setSelectedStudents(prev => [...prev, student]);
+    e.stopPropagation();
+    try {
+      const response = await fetch("http://localhost:5197/api/ProjectUser/assign", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          UserId: student.id,
+          ProjectId: projectId
+        })
+      });
+
+      if (!response.ok) {
+        if (response.status === 400) {
+          setAlertMessage("This student is already assigned to this project");
+          setShowAlert(true);
+          setTimeout(() => setShowAlert(false), 3000);
+          return;
+        }
+        throw new Error("Failed to add student");
+      }
+
+      // Refresh project students list
+      const projectStudentsResponse = await fetch(`http://localhost:5197/api/ProjectUser/project/${projectId}`);
+      if (projectStudentsResponse.ok) {
+        const updatedProjectStudents = await projectStudentsResponse.json();
+        setProjectStudents(updatedProjectStudents);
+      }
+      
+      setDropdownOpen(prev => ({ ...prev, student: false }));
+      setSearchTerm("");
+    } catch (error) {
+      console.error("Error adding student:", error);
     }
-    setSearchTerm("");
   };
 
   const filteredSupervisors = allSupervisors.filter(supervisor =>
@@ -280,7 +342,7 @@ const ProjectDetailLeftNav = ({ projectId }) => {
           </Dropdown>
         </div>
         <Nav pills vertical>
-          {selectedStudents.map((student) => (
+          {projectStudents.map((student) => (
             <NavItem key={student.id}>
               <NavLink href="#" className="d-flex">
                 <Media>
@@ -299,6 +361,26 @@ const ProjectDetailLeftNav = ({ projectId }) => {
           ))}
         </Nav>
       </div>
+
+      {/* Alert Notification */}
+      {showAlert && (
+        <Alert 
+          color="warning" 
+          className="position-fixed" 
+          style={{ 
+            top: '80px', 
+            right: '20px', 
+            zIndex: 1000,
+            minWidth: '300px',
+            padding: '15px',
+            margin: '10px',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            borderRadius: '4px'
+          }}
+        >
+          {alertMessage}
+        </Alert>
+      )}
     </React.Fragment>
   );
 };
