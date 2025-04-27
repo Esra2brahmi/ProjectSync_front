@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useLocation } from 'react-router-dom';
 
 import { 
     Container,
@@ -14,37 +15,44 @@ import TasksGrid from './TasksGrid';
 import { ProjectDetailLeftNav } from "../../components/Projects/ProjectDetailLeftNav";
 import { ProjectsSmHeader } from "../../components/Projects/ProjectsSmHeader";
 
-const Tasks = (props) => (
-    <React.Fragment>
-        <Container>
-            <HeaderMain 
-                title="Tasks"
-                className="mb-5 mt-4"
-            />
-            <Row>
-                <Col lg={ 3 }>
-                    <ProjectDetailLeftNav />
-                </Col>
-                <Col lg={ 9 }>
-                    <ProjectsSmHeader
-                        subTitle="Projects"
-                            subTitleLink="/apps/projects/list"
-                        title={props.match.params.type === "list"?"Tasks List":"Tasks Grid"} 
-                        linkList="/apps/tasks/list"
-                        linkGrid="/apps/tasks/grid"
-                        btnShowKanban
-                    />
+const Tasks = (props) => {
+    const location = useLocation();
+    const pathSegments = location.pathname.split('/');
+    const projectId = pathSegments[pathSegments.length - 1];
 
-                    { 
-                        props.match.params.type === "list" ?
-                            <TasksList /> :
-                            <TasksGrid />
-                    }
-                </Col>
-            </Row>
-        </Container>
-    </React.Fragment>
-);
+    return (
+        <React.Fragment>
+            <Container>
+                <HeaderMain 
+                    title="Tasks"
+                    className="mb-5 mt-4"
+                />
+                <Row>
+                    <Col lg={ 3 }>
+                        <ProjectDetailLeftNav projectId={projectId} />
+                    </Col>
+                    <Col lg={ 9 }>
+                        <ProjectsSmHeader
+                            subTitle="Projects"
+                            subTitleLink="/apps/projects/list"
+                            title={props.match.params.type === "list"?"Tasks List":"Tasks Grid"} 
+                            linkList="/apps/tasks/list"
+                            linkGrid="/apps/tasks/grid"
+                            btnShowKanban
+                        />
+
+                        { 
+                            props.match.params.type === "list" ?
+                                <TasksList /> :
+                                <TasksGrid />
+                        }
+                    </Col>
+                </Row>
+            </Container>
+        </React.Fragment>
+    );
+};
+
 Tasks.propTypes = {
     match: PropTypes.object.isRequired
 };

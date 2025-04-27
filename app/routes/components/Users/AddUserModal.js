@@ -50,15 +50,15 @@ const AddUserModal=({ isOpen, toggle })=>{
     
     return(
         <Modal isOpen={isOpen} toggle={toggle}>
-            <ModalHeader toggle={toggle}>Add New User</ModalHeader>
+            <ModalHeader toggle={toggle}>Add New Student</ModalHeader>
                 <ModalBody>
                     <Form>
                         <FormGroup>
-                            <Label for="userFirstName">User FirstName</Label>
+                            <Label for="userFirstName">Student First Name</Label>
                             <Input type="text" placeholder='user FirstName' id="userFirstName" value={userFirstName} onChange={(e) => setUserFirstName(e.target.value)}  />
                         </FormGroup>
                         <FormGroup>
-                            <Label for="userLastName">User LastName</Label>
+                            <Label for="userLastName">Student Last Name</Label>
                             <Input type="text"placeholder='user LastName' id="userLastName" value={userLastName} onChange={(e) => setUserLastName(e.target.value)} />
                         </FormGroup>
                         <FormGroup>
@@ -80,7 +80,7 @@ const AddUserModal=({ isOpen, toggle })=>{
                             <Input type="text" id="classe" value={classe} onChange={(e) => setClasse(e.target.value)} />
                         </FormGroup>
                         <FormGroup>
-                            <Label for="projectType">projectType</Label>
+                            <Label for="projectType">Project Type</Label>
                             <Input type="select" id="projectType" value={projectType} onChange={(e) => setProjectType(e.target.value)}>
                                 <option>PFA1</option>
                                 <option>PFA2</option>
@@ -88,7 +88,7 @@ const AddUserModal=({ isOpen, toggle })=>{
                             </Input>
                         </FormGroup>
                         <FormGroup>
-                            <Label for="supervisorFullName">Supervisor FullName</Label>
+                            <Label for="supervisorFullName">Supervisor Full Name</Label>
                             <Input type="text" id="supervisorFullName" value={supervisorFullName} onChange={(e) => setSupervisorFullName(e.target.value)} />
                         </FormGroup>
                     </Form>

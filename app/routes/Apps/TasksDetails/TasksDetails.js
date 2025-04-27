@@ -24,6 +24,7 @@ import {
   InputGroupAddon,
   Badge,
   Avatar,
+  Alert,
 } from "./../../../components";
 import { randomAvatar } from "./../../../utilities";
 import { HeaderMain } from "../../components/HeaderMain";
@@ -42,6 +43,12 @@ const TasksDetails = () => {
     projectId: null
   });
   const [project, setProject] = useState({});
+  const [students, setStudents] = useState([]);
+  const [assignedStudents, setAssignedStudents] = useState([]);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const pathSegments = location.pathname.split('/');
   const id = pathSegments[pathSegments.length - 1];
 
@@ -60,31 +67,48 @@ const TasksDetails = () => {
     });
   }, []);
 
+  // Fetch task details and assigned students when component mounts
   useEffect(() => {
-          const fetchTask = async () => {
-              if (!id) return;  
+    const fetchTaskAndStudents = async () => {
+      if (!id) return;  
       
-              try {
-                  const response = await fetch(`http://localhost:5197/task/${id}`);
-                  const data = await response.json();
-                  setTask(prev => ({
-                  ...prev,
-                  ...data,
-                  // Ensure attachments are always an array
-                  attachments: Array.isArray(data.attachments) ? data.attachments : prev.attachments
-                }));
+      try {
+        // Fetch task details
+        const taskResponse = await fetch(`http://localhost:5197/task/${id}`);
+        const taskData = await taskResponse.json();
+        setTask(prev => ({
+          ...prev,
+          ...taskData,
+          attachments: Array.isArray(taskData.attachments) ? taskData.attachments : prev.attachments
+        }));
 
-                  // Fetch project details once we have projectId
-                  if (data.projectId) {
-                    fetchProject(data.projectId);
-                  }
-              } catch (error) {
-                  console.error("Error fetching task detail:", error);
-              }
-          };
-      
-          fetchTask();
-      }, [id]); 
+        // Fetch assigned student
+        const studentResponse = await fetch(`http://localhost:5197/task/${id}/student`);
+        if (studentResponse.ok) {
+          const studentData = await studentResponse.json();
+          console.log("Assigned student:", studentData);
+          // Store the single student in state
+          setAssignedStudents(studentData ? [studentData] : []);
+        } else if (studentResponse.status === 404) {
+          // No student assigned yet
+          setAssignedStudents([]);
+        } else {
+          console.error("Failed to fetch assigned student. Status:", studentResponse.status);
+          setAssignedStudents([]);
+        }
+
+        // Fetch project details if needed
+        if (taskData.projectId) {
+          fetchProject(taskData.projectId);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setAssignedStudents([]);
+      }
+    };
+
+    fetchTaskAndStudents();
+  }, [id]);
 
   const { taskName, taskDescription, dueDate,projectId } = task;
 
@@ -106,7 +130,70 @@ const TasksDetails = () => {
   
   const { projectName, supervisorFirstName,supervisorLastName, status,startDate,endDate,department } = project;
   
-   return (
+  // Add useEffect to fetch students when component mounts
+  useEffect(() => {
+    fetchStudents();
+  }, []);
+
+  const fetchStudents = async () => {
+    try {
+      const response = await fetch("http://localhost:5197/user");
+      const data = await response.json();
+      setStudents(data);
+    } catch (error) {
+      console.error("Error fetching students:", error);
+    }
+  };
+
+  const handleAddStudent = async (student) => {
+    try {
+      const response = await fetch("http://localhost:5197/task/assign-student", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          TaskId: parseInt(id),
+          UserId: student.id
+        })
+      });
+
+      if (!response.ok) {
+        if (response.status === 400) {
+          setAlertMessage("This task is already assigned to a student");
+          setShowAlert(true);
+          setTimeout(() => setShowAlert(false), 3000);
+          return;
+        }
+        throw new Error("Failed to assign student");
+      }
+
+      // Refresh assigned student
+      const studentResponse = await fetch(`http://localhost:5197/task/${id}/student`);
+      if (studentResponse.ok) {
+        const studentData = await studentResponse.json();
+        console.log("Updated assigned student:", studentData);
+        setAssignedStudents(studentData ? [studentData] : []);
+      } else if (studentResponse.status === 404) {
+        setAssignedStudents([]);
+      } else {
+        console.error("Failed to refresh assigned student. Status:", studentResponse.status);
+      }
+      
+      setDropdownOpen(false);
+      setSearchTerm("");
+    } catch (error) {
+      console.error("Error assigning student:", error);
+    }
+  };
+
+  const filteredStudents = students.filter(student =>
+    `${student.userFirstName} ${student.userLastName}`
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
+  );
+
+  return (
   <React.Fragment>
     <Container>
       <HeaderMain title="Tasks Details" className="mb-5 mt-4" />
@@ -198,65 +285,70 @@ const TasksDetails = () => {
           <div className="mb-4">
             <div className="small mb-3">Assigned to</div>
             <Nav pills vertical>
+              {assignedStudents.length > 0 ? (
+                <NavItem>
+                  <NavLink href="#" className="d-flex">
+                    <Media>
+                      <Media left middle className="mr-3 align-self-center">
+                        <Avatar.Image size="md" src={randomAvatar()} />
+                      </Media>
+                      <Media body>
+                        <div className="mt-0">
+                          {assignedStudents[0].userFirstName} {assignedStudents[0].userLastName}
+                        </div>
+                        <div className="small text-muted">
+                          {assignedStudents[0].department}
+                        </div>
+                      </Media>
+                    </Media>
+                    <i className="fa fa-fw fa-circle text-success ml-auto align-self-center ml-2"></i>
+                  </NavLink>
+                </NavItem>
+              ) : (
+                <NavItem>
+                  <NavLink href="#" className="text-muted">
+                    No student assigned
+                  </NavLink>
+                </NavItem>
+              )}
               <NavItem>
-                <NavLink href="#" className="d-flex">
-                  <Media>
-                    <Media left middle className="mr-3 align-self-center">
-                      <Avatar.Image size="md" src={randomAvatar()} />
-                    </Media>
-                    <Media body>
-                      <div className="mt-0">
-                        {faker.person.firstName()} {faker.person.lastName()}
-                      </div>
-                      <span className="small">
-                        {faker.location.state()}, {faker.location.stateAbbr()}
-                      </span>
-                    </Media>
-                  </Media>
-                  <i className="fa fa-fw fa-circle text-success ml-auto align-self-center ml-2"></i>
-                </NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink href="#" className="d-flex">
-                  <Media>
-                    <Media left middle className="mr-3 align-self-center">
-                      <Avatar.Image size="md" src={randomAvatar()} />
-                    </Media>
-                    <Media body>
-                      <div className="mt-0">
-                        {faker.person.firstName()} {faker.person.lastName()}
-                      </div>
-                      <span className="small">
-                        {faker.location.state()}, {faker.location.stateAbbr()}
-                      </span>
-                    </Media>
-                  </Media>
-                  <i className="fa fa-fw fa-circle text-warning ml-auto align-self-center ml-2"></i>
-                </NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink href="#" className="d-flex">
-                  <Media>
-                    <Media left middle className="mr-3 align-self-center">
-                      <Avatar.Image size="md" src={randomAvatar()} />
-                    </Media>
-                    <Media body>
-                      <div className="mt-0">
-                        {faker.person.firstName()} {faker.person.lastName()}
-                      </div>
-                      <span className="small">
-                        {faker.location.state()}, {faker.location.stateAbbr()}
-                      </span>
-                    </Media>
-                  </Media>
-                  <i className="fa fa-fw fa-circle text-danger ml-auto align-self-center ml-2"></i>
-                </NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink href="#">
-                  <i className="fa fa-fw fa-plus mr-2"></i>
-                  Add New People
-                </NavLink>
+                <UncontrolledButtonDropdown isOpen={dropdownOpen} toggle={() => setDropdownOpen(!dropdownOpen)}>
+                  <DropdownToggle color="link" className="p-0">
+                    <NavLink href="#">
+                      <i className="fa fa-fw fa-plus mr-2"></i>
+                      {assignedStudents.length > 0 ? "Change Student" : "Assign Student"}
+                    </NavLink>
+                  </DropdownToggle>
+                  <DropdownMenu 
+                    style={{ 
+                      width: "300px",
+                      position: "fixed",
+                      top: "100px",
+                      left: "calc(25% + 50px)",
+                      zIndex: 1000,
+                      transform: "translateX(0)",
+                      marginLeft: "auto"
+                    }}
+                  >
+                    <div className="p-2">
+                      <Input
+                        type="text"
+                        placeholder="Search students..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    </div>
+                    {filteredStudents.map((student) => (
+                      <DropdownItem
+                        key={student.id}
+                        onClick={() => handleAddStudent(student)}
+                      >
+                        {student.userFirstName} {student.userLastName}
+                      </DropdownItem>
+                    ))}
+                  </DropdownMenu>
+                </UncontrolledButtonDropdown>
               </NavItem>
             </Nav>
           </div>
@@ -329,12 +421,29 @@ const TasksDetails = () => {
         </Col>
       </Row>
       {/* END Header 1 */}
+
+      {/* Alert Notification */}
+      {showAlert && (
+        <Alert 
+          color="warning" 
+          className="position-fixed" 
+          style={{ 
+            top: '80px', 
+            right: '20px', 
+            zIndex: 1000,
+            minWidth: '300px',
+            padding: '15px',
+            margin: '10px',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            borderRadius: '4px'
+          }}
+        >
+          {alertMessage}
+        </Alert>
+      )}
     </Container>
   </React.Fragment>
  );
 };
-
-
-
 
 export default TasksDetails;
