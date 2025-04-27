@@ -3,6 +3,8 @@ import axios from "axios";
 import { faker } from "@faker-js/faker";
 import AddSupervisorModal from "./AddSupervisorModal";
 import UpdateSupervisorModal from "./UpdateSupervisorModal";
+import AddJuryMemberModal from "./AddJuryMemberModal";
+import UpdateJuryMemberModal from "./UpdateJuryMemberModal";
 import {
   Container,
   Row,
@@ -31,19 +33,25 @@ import { DlRowContacts } from "../../components/Profile/DlRowContacts";
 import { DlRowAddress } from "../../components/Profile/DlRowAddress";
 import { TrTableClients } from "./components/TrTableClients";
 import { TrTableCompanies } from "./components/TrTableCompanies";
+import { TrTableJuryMembers } from "./components/TrTableJuryMembers";
+
 
 const Clients = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [supervisors, setSupervisors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedSupervisor, setSelectedSupervisor] = useState(null); 
+  const [selectedJuryMember, setselectedJuryMember] = useState(null); 
   const [departments, setDepartments] = useState([]);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
-
+  const [juryMembers, setJuryMembers] = useState([]);
+  const [isUpdateModalJuryOpen, setIsUpdateModalJuryOpen] = useState(false);
   useEffect(() => {
     fetchSupervisors();
+    fetchJuryMembers();
   }, []);
-
+  
+  /*For Supervisors */
   const fetchSupervisors = async () => {
     try {
       setLoading(true);
@@ -64,7 +72,56 @@ const Clients = () => {
       console.error("Error adding supervisor:", error);
     }
   };
+  const handleUpdateSupervisor = async (updatedData) => {
+    try {
+      await axios.put(`http://localhost:5197/api/Supervisor/${updatedData.id}`, updatedData);
+      await fetchSupervisors(); // Refresh the list
+    } catch (error) {
+      console.error("Error updating supervisor:", error);
+    }
+  };
+  const handleDeleteSupervisors = (id) => {
+    setSupervisors((prevSupervisor) => prevSupervisor.filter((supervisor) => supervisor.id !== id));
+  };
 
+  /*For JuryMembers */
+  const fetchJuryMembers = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get("http://localhost:5197/api/JuryMember");
+      setJuryMembers(response.data);
+    } catch (error) {
+      console.error("Error fetching JuryMember:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+   const handleAddJuryMember= async (juryMemberData) => {
+    try {
+      await axios.post("http://localhost:5197/api/JuryMember", juryMemberData);
+      await fetchJuryMembers(); 
+    } catch (error) {
+      console.error("Error adding JuryMembers:", error);
+    }
+  };
+  const handleUpdateJuryMember = async (updatedData) => {
+    try {
+      await axios.put(`http://localhost:5197/api/JuryMember/${updatedData.id}`, updatedData);
+      setJuryMembers((prevMember) =>
+        prevMember.map((juryMember) =>
+          juryMember.id === updatedData.id ? updatedData : juryMember
+        )
+      );
+    } catch (error) {
+      console.error("Error updating JuryMember:", error);
+    }
+
+  };
+  const handleDeleteJuryMember = (id) => {
+    setJuryMembers((prevMember) => prevMember.filter((member) => member.id !== id));
+  };
+/*For Departments */
   useEffect(() => {
   const fetchDepartments = async () => {
     try {
@@ -78,19 +135,9 @@ const Clients = () => {
   fetchDepartments();
 }, []);
 
-  // get department name by ID
   const getDepartmentName = (id) => {
   const department = departments.find(d => d.id === id);
   return department ? department.name : `Department ${id}`;
-};
-
-const handleUpdateSupervisor = async (updatedData) => {
-  try {
-    await axios.put(`http://localhost:5197/api/Supervisor/${updatedData.id}`, updatedData);
-    await fetchSupervisors(); // Refresh the list
-  } catch (error) {
-    console.error("Error updating supervisor:", error);
-  }
 };
 
 const updateDepartment = (updatedDepartment) => {
@@ -112,18 +159,23 @@ return (
       <Row>
         <Col lg={8}>
           <Card className="mb-3">
-            <UncontrolledTabs initialActiveTabId="clients">
+            <UncontrolledTabs initialActiveTabId="supervisors" >
               <CardBody>
                 <div className="d-flex">
                   <Nav pills>
                     <NavItem>
-                      <UncontrolledTabs.NavLink tabId="supervisors">
+                      <UncontrolledTabs.NavLink tabId="supervisors"  >
                         Supervisors
                       </UncontrolledTabs.NavLink>
                     </NavItem>
                     <NavItem>
-                      <UncontrolledTabs.NavLink tabId="departments">
+                      <UncontrolledTabs.NavLink tabId="departments" >
                         Departments
+                      </UncontrolledTabs.NavLink>
+                    </NavItem>
+                    <NavItem>
+                      <UncontrolledTabs.NavLink tabId="juryMembers">
+                        Jury Members
                       </UncontrolledTabs.NavLink>
                     </NavItem>
                   </Nav>
@@ -142,12 +194,6 @@ return (
                   <UncontrolledTooltip placement="right" target="tooltipAddNew">
                     Add New
                   </UncontrolledTooltip>
-                  <UncontrolledTooltip
-                    placement="right"
-                    target="tooltipSettings"
-                  >
-                    Settings
-                  </UncontrolledTooltip>
                 </div>
               </CardBody>
 
@@ -157,6 +203,7 @@ return (
                   <Table className="mb-0" hover responsive>
                     <thead>
                       <tr>
+                     
                         <th className="bt-0"></th>
                         <th className="bt-0"></th>
                         <th className="bt-0">Name</th>
@@ -173,18 +220,16 @@ return (
                             </td>
                           </tr>
                         ) : (
-                          supervisors.map((supervisor) => (
+                          supervisors.map((supervisor,index) => (
                             <TrTableClients 
-                              key={supervisor.id}
-                              id={supervisor.id}
-                              firstName={supervisor.firstName}
-                              lastName={supervisor.lastName}
-                              email={supervisor.email}
-                              phoneNumber={supervisor.phoneNumber}
-                              academicTitle={supervisor.academicTitle}
-                              address={supervisor.address}
-                              onClick={() => setSelectedSupervisor(supervisor)}
+                              key={index}
+                              supervisor={supervisor}
+                              onDeleteSupervisor={handleDeleteSupervisors}
+                              onClick={() =>{ setSelectedSupervisor(supervisor);
+                                              setselectedJuryMember(null);
+                              }}
                               isSelected={selectedSupervisor?.id === supervisor.id}
+                              updateSupervisor={handleUpdateSupervisor}
                             />
                           ))
                         )}
@@ -229,6 +274,44 @@ return (
                   </Table>
                   {/* END Table */}
                 </TabPane>
+                <TabPane tabId="juryMembers">
+                  {/* START Table */}
+                  <Table className="mb-0" hover responsive>
+                    <thead>
+                      <tr>
+                        <th className="bt-0"></th>
+                        <th className="bt-0"></th>
+                        <th className="bt-0">Name</th>
+                        <th className="bt-0">Email</th>
+                        <th className="text-right bt-0">Phone</th>
+                        <th className="align-middle bt-0 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        {loading ? (
+                          <tr>
+                            <td colSpan="6" className="text-center">
+                              Loading...
+                            </td>
+                          </tr>
+                        ) : (
+                          juryMembers.map((juryMember,index) => (
+                            <TrTableJuryMembers 
+                              key={index}
+                              juryMember={juryMember}
+                              onDeleteJuryMember={handleDeleteJuryMember}
+                              onClick={() =>{ setselectedJuryMember(juryMember);
+                                         setSelectedSupervisor(null);
+                              }}
+                              isSelected={selectedJuryMember?.id === juryMember.id}
+                              updateJuryMember={handleUpdateJuryMember}
+                            />
+                          ))
+                        )}
+                      </tbody>
+                  </Table>
+                  {/* END Table */}
+                </TabPane>
               </UncontrolledTabs.TabContent>
             </UncontrolledTabs>
 
@@ -264,7 +347,7 @@ return (
           </Card>
         </Col>
         <Col lg={4}>
-         {selectedSupervisor && (
+         { selectedSupervisor && (
           <Card>
             <CardBody>
               <Profile supervisor={selectedSupervisor} />
@@ -297,13 +380,13 @@ return (
                 </Col>
               </Row>
               <div className="mt-4 mb-2">
-                <span className="small">Description</span>
+                <span className="font-weight-bold" style={{ fontSize: '1.0rem' }}>Description</span>
               </div>
               <p className="text-left">
                 {selectedSupervisor?.description || 'No description available'}
               </p>
               <div className="mt-4 mb-2">
-                <span className="small">Departments</span>
+                <span className="font-weight-bold" style={{ fontSize: '1.0rem' }}>Departments</span>
               </div>
               <div className="text-left mb-4">
                 {selectedSupervisor?.departmentIds?.map((departmentId) => (
@@ -321,7 +404,7 @@ return (
                 )}
               </div>
               <div className="mt-4 mb-2">
-                <span className="small">Contact</span>
+                <span className="font-weight-bold" style={{ fontSize: '1.0rem' }}>Contact</span>
               </div>
               <DlRowContacts
                 leftSideClassName="text-left"
@@ -329,17 +412,92 @@ return (
                 supervisor={selectedSupervisor}
               />
               <div className="mt-4 mb-2">
-                <span className="small">Address</span>
-              </div>
               <DlRowAddress
                 leftSideClassName="text-left"
                 rightSideClassName="text-right text-inverse"
                 supervisor={selectedSupervisor}
               />
+               </div>
             </CardBody>
           </Card>
-           )}
-        </Col>
+           )}    
+         {selectedJuryMember && (
+          <Card>
+            <CardBody>
+              <Profile supervisor={selectedJuryMember} />
+              <div className="text-center pb-1">
+                <ul className="list-inline">
+                  <li className="list-inline-item text-center">
+                    <h2 className="mb-1">23</h2>
+                    <span>Contracts</span>
+                  </li>
+                  <li className="list-inline-item text-center">
+                    <h2 className="mb-1">13</h2>
+                    <span>Tasks</span>
+                  </li>
+                  <li className="list-inline-item text-center">
+                    <h2 className="mb-1">5</h2>
+                    <span>Relases</span>
+                  </li>
+                </ul>
+              </div>
+              <Row className="mt-3">
+                <Col sm={6}>
+                  <Button color="primary" block>
+                    Message
+                  </Button>
+                </Col>
+                <Col sm={6}>
+                  <Button color="secondary" outline block onClick={() => setIsUpdateModalJuryOpen(true)}>
+                    Edit
+                  </Button>
+                </Col>
+              </Row>
+              <div className="mt-4 mb-2">
+                <span className="font-weight-bold" style={{ fontSize: '1.0rem' }}>Description</span>
+              </div>
+              <p className="text-left">
+                {selectedJuryMember?.description || 'No description available'}
+              </p>
+              <div className="mt-4 mb-2">
+                <span className="font-weight-bold" style={{ fontSize: '1.0rem' }}>Departments</span>
+              </div>
+              <div className="text-left mb-4">
+                {selectedJuryMember?.departmentIds?.map((departmentId) => (
+                  <Badge 
+                    key={departmentId} 
+                    pill 
+                    color={departmentId % 2 === 0 ? "primary" : "secondary"} 
+                    className="mr-1"
+                  >
+                    {getDepartmentName(departmentId)}
+                  </Badge>
+                ))}
+                <p>
+                {(!selectedJuryMember?.departmentIds || selectedJuryMember.departmentIds.length === 0) && (
+                  <span className="text-muted">No departments assigned</span>
+                )}</p>
+              </div>
+              <div className="mt-4 mb-2">
+                <span className="font-weight-bold" style={{ fontSize: '1.0rem' }}>Contact</span>
+              </div>
+              
+              <DlRowContacts
+                leftSideClassName="text-left"
+                rightSideClassName="text-right text-inverse"
+                supervisor={selectedJuryMember}
+              />
+             <div className="mt-4 mb-2">
+              <DlRowAddress
+                leftSideClassName="text-left"
+                rightSideClassName="text-right text-inverse"
+                supervisor={selectedJuryMember}
+              />
+              </div>
+            </CardBody>
+          </Card>
+           )} 
+      </Col>
       </Row>
       {/* END Content */}
     </Container>
@@ -349,11 +507,17 @@ return (
         onAddSupervisor={handleAddSupervisor}
       />
     <UpdateSupervisorModal
-  isOpen={isUpdateModalOpen}
-  toggle={() => setIsUpdateModalOpen(!isUpdateModalOpen)}
-  supervisor={selectedSupervisor}
-  onUpdateSupervisor={handleUpdateSupervisor}
-/>
+       isOpen={isUpdateModalOpen}
+       toggle={() => setIsUpdateModalOpen(!isUpdateModalOpen)}
+       supervisor={selectedSupervisor}
+       onUpdateSupervisor={handleUpdateSupervisor}
+       />
+    <UpdateJuryMemberModal
+      isOpen={isUpdateModalJuryOpen}
+      toggle={() => setIsUpdateModalJuryOpen(!isUpdateModalJuryOpen)}
+      juryMember={selectedJuryMember}
+      onUpdateJuryMember={handleUpdateJuryMember}
+    />
   </React.Fragment>
 );
 

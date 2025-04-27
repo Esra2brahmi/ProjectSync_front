@@ -4,8 +4,8 @@ import PropTypes from 'prop-types';
 const DlRowAddress = ({ leftSideClassName, rightSideClassName, supervisor }) => (
   <React.Fragment>
     <dl className="row">
-      <dt className={`col-sm-3 ${leftSideClassName}`}>Address</dt>
-      <dd className={`col-sm-9 ${rightSideClassName}`}>
+      <dt className={`col-sm-4 ${leftSideClassName}`}>Address</dt>
+      <dd className={`col-sm-8 ${rightSideClassName}`}>
         {supervisor?.address || 'Address not specified'}
       </dd>
     </dl>

@@ -1,29 +1,84 @@
-import React from "react";
-import { faker } from "@faker-js/faker";
-import PropTypes from "prop-types";
-
+import React ,{useState,useEffect} from "react";
 import {
-  Badge,
   Avatar,
   CustomInput,
   UncontrolledTooltip,
   AvatarAddOn,
   Media,
-  Button
+  UncontrolledButtonDropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem,
 } from "./../../../../components";
-
 import { randomArray } from "./../../../../utilities";
+import UpdateSupervisorModal from "../UpdateSupervisorModal";
 
 const status = ["secondary", "success", "warning", "danger"];
 
 const tag = ["secondary", "primary", "info"];
 
-const TrTableClients = ({ id, firstName, lastName, email, phoneNumber,academicTitle ,onClick,isSelected}) => (
+const TrTableClients = ({ supervisor,index ,onDeleteSupervisor,onClick,isSelected,updateSupervisor}) => {
+  const { id, firstName, lastName, email, phoneNumber,academicTitle}=supervisor;
+  const status = ["secondary", "success", "warning", "danger"];
+  const tag = ["secondary", "primary", "info"];
+  const [isSelectedSupervisor, setIsSelectedSupervisor] = useState(false);
+  const [isModalOpen, setModalOpen] = useState(false);
+   const toggleModal = () => setModalOpen(!isModalOpen);
+   const handleCheckboxChange = () => {setIsSelectedSupervisor(!isSelectedSupervisor);};
+  //edit supervisor
+  const handleEdit=async(updatedSupervisor)=>{
+    if(isSelectedSupervisor){
+      try{
+        const response=await fetch(`http://localhost:5197/api/Supervisor/${id}`,{
+          method:"PUT",
+          headers: {
+            "Content-Type": "application/json",//Indique au serveur que tu envoies du JSON
+          },
+          body:JSON.stringify(updatedSupervisor)//convertit l'objet updatedUser en JSON
+        });
+        if (response.ok) {
+          console.log("Supervisor edited successfully");
+          updateSupervisor(updatedSupervisor);
+          setIsSelectedSupervisor(false)
+        } else {
+          console.error("Error editing Supervisor", response);
+         
+        }
+      } catch (error) {
+        console.error("Error editing Supervisor:", error);
+      }
+    }
+  };
+
+  //delete supervisor
+  const handleDelete = async () => {
+    if (isSelectedSupervisor) {
+      try {
+        const response = await fetch(`http://localhost:5197/api/Supervisor/${id}`, {
+          method: "DELETE",  // Utilisation de la méthode DELETE pour supprimer
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+          if (response.ok) {
+            onDeleteSupervisor(id); 
+        } else {
+          console.error("Error deleting Supervisor", response);
+         
+        }
+      } catch (error) {
+        console.error("Error deleting Supervisor:", error);
+      }
+    }
+  };
+  return(
   <React.Fragment>
     <tr onClick={onClick}>
       <td className="align-middle">
         <CustomInput
           type="checkbox"
+          checked={isSelectedSupervisor}
+          onChange={handleCheckboxChange}
           id={`trTableClients-${id}`}
           label=""
           inline
@@ -71,29 +126,31 @@ const TrTableClients = ({ id, firstName, lastName, email, phoneNumber,academicTi
       <td className="align-middle">{email}</td>
       <td className="align-middle">{phoneNumber}</td>
       <td className="align-middle text-right">
-       <Button color="link"
-              className="align-self-center mr-2 text-decoration-none"
-              id="tooltipSettings"
-              >
-              <i className="fa fa-fw fa-gear"></i>
-              </Button>
-      </td>
+          <UncontrolledButtonDropdown>
+            <DropdownToggle color="link" className="pr-0">
+              <i className="fa fa-bars"></i>
+              <i className="fa fa-angle-down ml-2" />
+            </DropdownToggle>
+            <DropdownMenu right>
+              <DropdownItem onClick={toggleModal}>
+                <i className="fa fa-fw fa-pencil mr-2"></i>
+                Edit
+              </DropdownItem>
+              <DropdownItem divider />
+              <DropdownItem onClick={handleDelete}>
+                <i className="fa fa-fw fa-trash mr-2"></i>
+                Delete
+              </DropdownItem>
+            </DropdownMenu>
+          </UncontrolledButtonDropdown>
+        </td>
     </tr>
+    <UpdateSupervisorModal  isOpen={isModalOpen}
+                      toggle={toggleModal}
+                      onUpdateSupervisor={handleEdit}
+                      supervisor={supervisor}/>
   </React.Fragment>
-);
-TrTableClients.propTypes = {
-  id: PropTypes.node,
-  firstName: PropTypes.string,
-  lastName: PropTypes.string,
-  email: PropTypes.string,
-  phoneNumber: PropTypes.string,
-  academicTitle: PropTypes.string,
-  onClick: PropTypes.func,
-  isSelected: PropTypes.bool
-};
-TrTableClients.defaultProps = {
-  id: "1",
-  isSelected: false
-};
+)};
+
 
 export { TrTableClients };
