@@ -154,7 +154,7 @@ const handleDeleteDepartment = (id) => {
 return (
   <React.Fragment>
     <Container>
-      <HeaderMain title="Clients" className="mb-5 mt-4" />
+      <HeaderMain title="Users" className="mb-5 mt-4" />
       {/* START Content */}
       <Row>
         <Col lg={8}>

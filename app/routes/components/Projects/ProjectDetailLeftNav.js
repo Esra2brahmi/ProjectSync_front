@@ -231,24 +231,7 @@ const ProjectDetailLeftNav = ({ projectId }) => {
         </InputGroup>
       </div>
 
-      {/* Favorites Section */}
-      <div className="mb-4">
-        <div className="small mb-3">Favorites</div>
-        <Nav pills vertical>
-          <NavItem>
-            <NavLink href="#" active>
-              <i className="fa fa-fw fa-line-chart mr-2"></i>
-              Overview
-            </NavLink>
-          </NavItem>
-          <NavItem>
-            <NavLink href="#">
-              <i className="fa fa-fw fa-calendar-o mr-2"></i>
-              Calendar
-            </NavLink>
-          </NavItem>
-        </Nav>
-      </div>
+      
 
       {/* Supervisors Section */}
       <div className="mb-4">

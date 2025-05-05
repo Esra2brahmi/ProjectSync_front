@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 
 const AddProjectModal = ({ isOpen, toggle, onProjectAdded }) => {
     const [projectName, setProjectName] = useState('');
+    const [projectReference, setProjectReference] = useState('');
     const [supervisorFirstName, setSupervisorFirstName] = useState('');
     const [supervisorLastName, setSupervisorLastName] = useState('');
     const [startDate, setStartDate] = useState('');
@@ -15,6 +16,7 @@ const AddProjectModal = ({ isOpen, toggle, onProjectAdded }) => {
     const handleSubmit = async () => {
         const newProject = {
             projectName,
+            projectReference,
             supervisorFirstName,
             supervisorLastName,
             startDate,
@@ -44,6 +46,7 @@ const AddProjectModal = ({ isOpen, toggle, onProjectAdded }) => {
 
         // Reset fields after submission
         setProjectName('');
+        setProjectReference('');
         setSupervisorFirstName('');
         setSupervisorLastName('');
         setStartDate('');
@@ -62,6 +65,10 @@ const AddProjectModal = ({ isOpen, toggle, onProjectAdded }) => {
                     <FormGroup>
                         <Label for="projectName">Project Name</Label>
                         <Input type="text" id="projectName" value={projectName} onChange={(e) => setProjectName(e.target.value)} />
+                    </FormGroup>
+                    <FormGroup>
+                        <Label for="projectReference">Project Reference</Label>
+                        <Input type="text" id="projectReference" value={projectReference} onChange={(e) => setProjectReference(e.target.value)} />
                     </FormGroup>
                     <FormGroup>
                         <Label for="supervisorFirstName">Supervisor First Name</Label>

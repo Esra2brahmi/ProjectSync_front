@@ -16,7 +16,7 @@ const Users = (props) => (
     <React.Fragment>
         <Container>
             <HeaderMain 
-                title="Users"
+                title="Students"
                 className="mb-5 mt-4"
             />
             <Row>

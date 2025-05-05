@@ -14,19 +14,10 @@ const UsersLeftNav = () => (
             <Nav pills vertical>
                 <NavItem>
                     <NavLink href="#" active>
-                        All Contacts
+                        All Students
                     </NavLink>
                 </NavItem>
-                <NavItem>
-                    <NavLink href="#">
-                        Favorites
-                    </NavLink>
-                </NavItem>
-                <NavItem>
-                    <NavLink href="#">
-                        Private
-                    </NavLink>
-                </NavItem>
+                
             </Nav>
         </div>
         { /* END Left Nav  */}
@@ -39,7 +30,7 @@ const UsersLeftNav = () => (
                 <NavItem>
                     <NavLink href="#" className="d-flex">
                         <i className="fa fa-fw fa-circle text-primary align-self-center mr-2"></i>
-                        Family
+                        Software Engineering
                         <Badge color="secondary" pill className="ml-auto align-self-center">
                             12
                         </Badge>
@@ -48,7 +39,7 @@ const UsersLeftNav = () => (
                 <NavItem>
                     <NavLink href="#" className="d-flex">
                         <i className="fa fa-fw fa-circle text-info align-self-center mr-2"></i>
-                        Friends
+                        Industrial Engineering
                         <Badge color="secondary" pill className="ml-auto align-self-center">
                             3
                         </Badge>
@@ -57,7 +48,7 @@ const UsersLeftNav = () => (
                 <NavItem>
                     <NavLink href="#" className="d-flex">
                         <i className="fa fa-fw fa-circle text-success align-self-center mr-2"></i>
-                        Work
+                        Mechanical Engineering
                         <Badge color="secondary" pill className="ml-auto align-self-center">
                             67
                         </Badge>
@@ -66,7 +57,7 @@ const UsersLeftNav = () => (
                 <NavItem>
                     <NavLink href="#" className="d-flex">
                         <i className="fa fa-fw fa-circle text-warning align-self-center mr-2"></i>
-                        Trips
+                        Electrical Engineering
                         <Badge color="secondary" pill className="ml-auto align-self-center">
                             5
                         </Badge>
@@ -75,7 +66,7 @@ const UsersLeftNav = () => (
                 <NavItem>
                     <NavLink href="#" className="d-flex">
                         <i className="fa fa-fw fa-circle text-danger align-self-center mr-2"></i>
-                        Other
+                        Applied Mathematics Engineering
                         <Badge color="secondary" pill className="ml-auto align-self-center">
                             1
                         </Badge>
@@ -84,7 +75,7 @@ const UsersLeftNav = () => (
                 <NavItem>
                     <NavLink href="#">
                         <i className="fa fa-fw fa-plus mr-2"></i>
-                        Add New Label
+                        Add New Department
                     </NavLink>
                 </NavItem>
             </Nav>

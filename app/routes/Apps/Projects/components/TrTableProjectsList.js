@@ -19,7 +19,7 @@ import {
 const badges = ["secondary"];
 /*eslint-disable */
 const TrTableProjectsList = ({ project, index, refreshProjects }) => {
-  const { id,projectName, supervisorFirstName, supervisorLastName, startDate, endDate, status,department,level } = project;
+  const { id,projectName, supervisorFirstName, supervisorLastName, startDate, endDate, status,department,level,projectReference, projectTasks } = project;
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   
@@ -92,7 +92,14 @@ const TrTableProjectsList = ({ project, index, refreshProjects }) => {
       Paused: <Badge pill color="secondary">Paused</Badge>,
   };
 
-  const tasksCompleted = ["25", "50", "70", "90"];
+  // Get the total number of tasks for this project
+  const totalTasks = projectTasks?.length || 0;
+  
+  // For now, we'll assume no tasks are completed until we have that data
+  const completedTasks = 0;
+  
+  // Calculate the progress percentage
+  const progressPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
     
@@ -112,7 +119,7 @@ const TrTableProjectsList = ({ project, index, refreshProjects }) => {
           <td className="align-middle">
               <div>
               <Link to={`/apps/tasks/list/${id}`} className="text-decoration-none">
-                {projectName}
+                {projectName} <span className="text-secondary">{projectReference}</span>
               </Link>
 
               </div>
@@ -132,14 +139,20 @@ const TrTableProjectsList = ({ project, index, refreshProjects }) => {
           <td className="align-middle">{statusBadge[status]}</td>
           <td className="align-middle">
           <Progress
-            value={tasksCompleted[index % 4]}
+            value={progressPercentage}
             style={{ height: "5px" }}
             className="mb-2"
           />
               <div>
-                  Tasks Completed:
-                  <span className="text-inverse">36/94</span>
+                  Tasks Count:
+                  <span className="text-inverse ml-1">{totalTasks}</span>
               </div>
+              {totalTasks > 0 && (
+                <div>
+                  Completed:
+                  <span className="text-inverse ml-1">{completedTasks}/{totalTasks}</span>
+                </div>
+              )}
           </td>
           <td className="align-middle">
           {level || "PFA1"}
